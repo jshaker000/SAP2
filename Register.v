@@ -1,7 +1,7 @@
 `default_nettype none
 
 module Register #(
-  parameter WIDTH = 8
+  parameter WIDTH = 16
 )(
   input wire             clk,
   input wire             clk_en,

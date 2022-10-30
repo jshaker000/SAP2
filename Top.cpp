@@ -56,8 +56,9 @@ static void tick ( int tickcount, VTop *tb,
 
 int main(int argc, char**argv)
 {
-    const bool dump_traces = (GetEnv("DUMPTRACES") == "1") || (GetEnv("DUMP_TRACES") == "1");
-    const std::string dp_f = (GetEnv("DUMP_F") != "") ? GetEnv("DUMP_F") : "top_trace.vcd";
+    const bool          dump_traces = (GetEnv("DUMPTRACES") == "1") || (GetEnv("DUMP_TRACES") == "1");
+    const std::string   dp_f        = (GetEnv("DUMP_F") != "")    ? GetEnv("DUMP_F")                : "top_trace.vcd";
+    const std::uint64_t max_steps   = (GetEnv("MAX_STEPS") != "") ? std::atoll(GetEnv("MAX_STEPS").c_str()) : 3500000;
     Verilated::commandArgs(argc,argv);
     VTop          *tb  = new VTop;
     if (tb == nullptr)
@@ -89,7 +90,7 @@ int main(int argc, char**argv)
     bool          out_in = false;
     std::uint64_t out_data = 0;
 
-    int k = 1;
+    std::uint64_t k = 1;
     do
     {
         tick(k, tb, tfp);
@@ -100,7 +101,7 @@ int main(int argc, char**argv)
         }
         out_in   = tb->Top->get_out_in();
         k++;
-    } while (k < 100000 && (halt!=1));
+    } while (k < max_steps && (halt!=1));
 
 
     // return an error if we exited by infinite loop

@@ -5,8 +5,8 @@
 // (meaning reading / writing simultaneously will read the old data and write the new data
 
 module Ram #(
-  parameter  RAM_DEPTH  = 16,
-  parameter  WIDTH      =  8,
+  parameter  RAM_DEPTH  = 2**16,
+  parameter  WIDTH      = 16,
   parameter  FILE       = "ram.hex",
   localparam ADDR_WIDTH = $clog2(RAM_DEPTH)
 )(

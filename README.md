@@ -18,6 +18,7 @@ This computer is generally based on the SAP1 archetecture, but has these enhance
     3. Added a Memory Data Register which can use the bus to load the lower 8 bits into its lower 8 bits, the lower 8 bits into its upper 8 bits, and or the upper 8 bits into its upper 8 bits. That allows us to store memory addresses in memory in two consecutive bytes.
     4. Added stack functionality
     5. Added additional registers: Temp, B, C and added move instructions for each of them
+    6. Added ability to address into memory using registers, essentially allowing for array access
 
 Example programs using these are in `ram.hex` and `fib.ram.hex` which demonstrate doing multiplication in a subroutine using the stack and in a loop and a faster way to compute the fibbonacci sequence than on the SAP1
 using the extra registers rather than needing to use RAM to store temporary results.
@@ -33,9 +34,12 @@ The main bench is in *Top.cpp*. You have the option to dump the outputs to a tra
 This will show you all waveforms. You can combine these options using enviornment variables.
 Setting a variable to "1" will set it. Setting it to anything else, or leaving unset will keep it disabled.
 
+The bench tries to prevent infinite loops by killing the simulation is more than `MAX_STEPS` clock cycles have passed.
+You can freely set this to any integer you like.
+
 IE
 
-    DUMP_TRACES=1 make
+    DUMP_TRACES=1 MAX_STEPS=100000 make
 
 You can set the DUMP_F variable to name the vcd file (otherwise there is a default name).
 

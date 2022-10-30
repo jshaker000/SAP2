@@ -1,82 +1,81 @@
 // Demonstrate a multiplication subroutine
-27    // addr:0x0 | JMP,RUN | 1/3
-1c    // addr:0x1 | JMP,RUN | 2/3
-00    // addr:0x2 | JMP,RUN | 3/3
+002d  // addr:0x0000 | JMP,RUN | 1/2
+001f  // addr:0x0001 | JMP,RUN | 2/2
 // MULT_START: (multiply A, B, storing result in T, then pop back to caller)
-14    // addr:0x3 | PSH,A    | 1/1
-18    // addr:0x4 | PSH,B    | 1/1
-1a    // addr:0x5 | PSH,C    | 1/1
-26    // addr:0x6 | LDI,C 00 | 1/2
-00    // addr:0x7 | LDI,C 00 | 2/2
+001a  // addr:0x0002 | PSH,A      | 1/1
+001e  // addr:0x0003 | PSH,B      | 1/1
+0020  // addr:0x0004 | PSH,C      | 1/1
+002c  // addr:0x0005 | LDI,C 0000 | 1/2
+0000  // addr:0x0006 | LDI,C 0000 | 2/2
+0034  // addr:0x0007 | SUB,B      | 1/1
+002f  // addr:0x0008 | JIC MULT_LOOP | 1/2
+000d  // addr:0x0009 | JIC MULT_LOOP | 2/2
+// MULT_SWAP: If A > B swap A and B for speed
+0015  // addr:0x000a | MOVB,T     | 1/1
+000f  // addr:0x000b | MOVA,B     | 1/1
+0011  // addr:0x000c | MOVT,A     | 1/1
 //   MULT_LOOP:
-30   // addr:0x8  | ADDI 00        | 1/2
-00   // addr:0x9  | ADDI 00        | 2/2
-28   // addr:0xa  | JIZ MULT_END   | 1/3
-17   // addr:0xb  | JIZ MULT_END   | 2/3
-00   // addr:0xc  | JIZ MULT_END   | 3/3
-31   // addr:0xd  | SUBI 01        | 1/2
-01   // addr:0xe  | SUBI 01        | 2/2
-16   // addr:0xf  | PSH,T          | 1/1
-11   // addr:0x10 | MOVC,A         | 1/1
-34   // addr:0x11 | ADD,B          | 1/1
-15   // addr:0x12 | POP,A          | 1/1
-0d   // addr:0x13 | MOVT,C         | 1/1
-27   // addr:0x14 | JUMP,MULT_LOOP | 1/3
-08   // addr:0x15 | JUMP,MULT_LOOP | 2/3
-00   // addr:0x16 | JUMP,MULT_LOOP | 3/3
+0031 // addr:0x000d | ADDI 0000     | 1/2
+0000 // addr:0x000e | ADDI 0000     | 2/2
+002e // addr:0x000f | JIZ MULT_END  | 1/2
+001a // addr:0x0010 | JIZ MULT_END  | 2/2
+0032 // addr:0x0011 | SUBI 0001     | 1/2
+0001 // addr:0x0012 | SUBI 0001     | 2/2
+001c // addr:0x0013 | PSH,T         | 1/1
+0017 // addr:0x0014 | MOVC,A         | 1/1
+0033 // addr:0x0015 | ADD,B          | 1/1
+001b // addr:0x0016 | POP,A          | 1/1
+0013 // addr:0x0017 | MOVT,C         | 1/1
+002d // addr:0x0018 | JUMP,MULT_LOOP | 1/2
+000d // addr:0x0019 | JUMP,MULT_LOOP | 2/2
 //   MULT_END:
-12    // addr:0x17 | MOVC,T   | 1/1
-1b    // addr:0x18 | POP,C    | 1/1
-19    // addr:0x19 | POP,B    | 1/1
-15    // addr:0x1a | POP,A    | 1/1
-1d    // addr:0x1b | POP,PRGCN| 1/1
+0018  // addr:0x001a | MOVC,T   | 1/1
+0021  // addr:0x001b | POP,C    | 1/1
+001f  // addr:0x001c | POP,B    | 1/1
+001b  // addr:0x001d | POP,A    | 1/1
+0023  // addr:0x001e | POP,PRGCN| 1/1
 // DONE MULT
 // RUN:
 // 3 * 4 =
-24    // addr:0x1c| LDI,A 03       | 1/2
-03    // addr:0x1d| LDI,A 03       | 2/2
-20    // addr:0x1e| OUT,A          | 1/1
-25    // addr:0x1f| LDI,B 04       | 1/2
-04    // addr:0x20| LDI,B 04       | 2/2
-22    // addr:0x21| OUT,B          | 1/1
-1c    // addr:0x22| PSH,PRGCN      | 1/2
-27    // addr:0x23| JMP MULT_START | 1/3
-03    // addr:0x24| JMP MULT_START | 1/3
-00    // addr:0x25| JMP MULT_START | 1/3
-21    // addr:0x26| OUT,T          | 1/1
+002a  // addr:0x001f| LDI,A 0003     | 1/2
+0003  // addr:0x0020| LDI,A 0003     | 2/2
+0026  // addr:0x0021| OUT,A          | 1/1
+002b  // addr:0x0022| LDI,B 0004     | 1/2
+0004  // addr:0x0023| LDI,B 0004     | 2/2
+0028  // addr:0x0024| OUT,B          | 1/1
+0022  // addr:0x0025| PSH,PRGCN      | 1/2
+002d  // addr:0x0026| JMP MULT_START | 1/2
+0002  // addr:0x0026| JMP MULT_START | 2/2
+0027  // addr:0x0028| OUT,T          | 1/1
 // 8 * 9 =
-24    // addr:0x27| LDI,A 09       | 1/2
-09    // addr:0x28| LDI,A 09       | 2/2
-20    // addr:0x29| OUT,A          | 1/1
-25    // addr:0x2a| LDI,B 08       | 1/2
-08    // addr:0x2b| LDI,B 08       | 2/2
-22    // addr:0x2c| OUT,B          | 1/1
-1c    // addr:0x2d| PSH,PRGCN      | 1/2
-27    // addr:0x2e| JMP MULT_START | 1/3
-03    // addr:0x2f| JMP MULT_START | 1/3
-00    // addr:0x30| JMP MULT_START | 1/3
-21    // addr:0x31| OUT,T          | 1/1
-// 5 times tables
-24    // addr:0x32| LDI,A 01       | 1/2
-01    // addr:0x33| LDI,A 01       | 2/2
-25    // addr:0x34| LDI,B 05       | 1/2
-05    // addr:0x35| LDI,B 05       | 2/2
+002a  // addr:0x0029| LDI,A 0009     | 1/2
+0009  // addr:0x002a| LDI,A 0009     | 2/2
+0026  // addr:0x002b| OUT,A          | 1/1
+002b  // addr:0x002c| LDI,B 0008     | 1/2
+0008  // addr:0x002d| LDI,B 0008     | 2/2
+0028  // addr:0x002e| OUT,B          | 1/1
+0022  // addr:0x002f| PSH,PRGCN      | 1/2
+002d  // addr:0x0030| JMP MULT_START | 1/2
+0002  // addr:0x0031| JMP MULT_START | 2/2
+0027  // addr:0x0032| OUT,T          | 1/1
+// 5 times tables (done inefficiently by multiplying each time, but demoing a loop and subroutine call)
+002a  // addr:0x0033| LDI,A 0001     | 1/2
+0001  // addr:0x0034| LDI,A 0001     | 2/2
+002b  // addr:0x0035| LDI,B 0005     | 1/2
+0005  // addr:0x0036| LDI,B 0005     | 2/2
 // LOOP_5_TIMES_TABLES
-30    // addr:0x36| ADDI 205 (dec) | 1/2
-cd    // addr:0x37| ADDI 205 (dec) | 2/2
-29    // addr:0x38| JIC  HALT      | 1/3
-46    // addr:0x39| JIC  HALT      | 2/3
-00    // addr:0x3a| JIC  HALT      | 3/3
-1c    // addr:0x3b| PSH,PRGCN      | 1/2
-27    // addr:0x3c| JMP MULT_START | 1/3
-03    // addr:0x3d| JMP MULT_START | 1/3
-00    // addr:0x3e| JMP MULT_START | 1/3
-21    // addr:0x3f| OUT,T          | 1/1
-30    // addr:0x40| ADDI 1 (dec)   | 1/2
-01    // addr:0x41| ADDI 1 (dec)   | 2/2
-0b    // addr:0x42| MOVT,A         | 1/1
-27    // addr:0x43| JMP LOOP_5_TIMES_TABLES | 1/3
-36    // addr:0x44| JMP LOOP_5_TIMES_TABLES | 2/3
-00    // addr:0x45| JMP LOOP_5_TIMES_TABLES | 3/3
+0031  // addr:0x0037| ADDI 2**16(1 - 1/5) (dec) | 1/2
+cccd  // addr:0x0038| ADDI 2**16(1 - 1/5) (dec) | 2/2
+002f  // addr:0x0039| JIC  HALT      | 1/2
+0044  // addr:0x003a| JIC  HALT      | 2/2
+0022  // addr:0x003b| PSH,PRGCN      | 1/2
+002d  // addr:0x003c| JMP MULT_START | 1/2
+0002  // addr:0x003d| JMP MULT_START | 1/2
+0027  // addr:0x003e| OUT,T          | 1/1
+0031  // addr:0x003f| ADDI 1 (dec)   | 1/2
+0001  // addr:0x0040| ADDI 1 (dec)   | 2/2
+0011  // addr:0x0041| MOVT,A         | 1/1
+002d  // addr:0x0042| JMP LOOP_5_TIMES_TABLES | 1/2
+0037  // addr:0x0043| JMP LOOP_5_TIMES_TABLES | 2/2
 // HALT
-ff    // addr:0x46| HALT | 1/1
+ffff  // addr:0x0044| HALT | 1/1

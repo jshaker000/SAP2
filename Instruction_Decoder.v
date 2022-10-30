@@ -11,8 +11,8 @@ module Instruction_Decoder (
   i_odd,
   o_control_word
 );
-  parameter  INSTRUCTION_WIDTH  = 4;
-  parameter  INSTRUCTION_STEPS  = 8;
+  parameter  INSTRUCTION_WIDTH  = 16;
+  parameter  INSTRUCTION_STEPS  = 32;
 
   `include "instructions.vi"
 
@@ -28,292 +28,264 @@ module Instruction_Decoder (
   input wire                             i_carry;
   output wire   [CONTROL_WORD_WIDTH-1:0] o_control_word;
 
-  // NOTE when reading addresses from RAM, they are contaned in little ENDIAN in the next 2 words
   assign o_control_word =
                  // Fetch, put prgm cntr in mem addr, fetch instruction, advance PC. All instructions start like this
                  // Also note, all instructions must end in a c_ADV to advance to the next instruction
                  i_step == 'h0 ? c_MI | c_CO :
                  i_step == 'h1 ? c_RO | c_II | c_CE :
-                   // i_instruction == 8'h00 ? // unimplemented - defaults at bottom to NOP
-                   // LDA - put data in RAM[addr] in A. addr is the next 2 bytes in ram
-                   i_instruction == 8'h01 ?
+                   // i_instruction == 16'h0000 ? // unimplemented - defaults at bottom to NOP
+                   // LD,A - put data in RAM[addr] in A. addr is the next word in ram
+                   i_instruction == 16'h0001 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_MI | c_MDRO :
-                     i_step == 'h7 ? c_RO | c_ARI | c_ADV:
+                     i_step == 'h3 ? c_RO | c_ARI | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // LDB - put data in RAM[addr] in B. addr is next 2 bytes in ram
-                   i_instruction == 8'h02 ?
+                   // LD,B - put data in RAM[addr] in B. addr is next word in ram
+                   i_instruction == 16'h0002 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_MI | c_MDRO :
-                     i_step == 'h7 ? c_RO | c_BRI | c_ADV:
+                     i_step == 'h3 ? c_RO | c_BRI | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // LDC - put data in RAM[addr] in C. addr is next 2 bytes in ram
-                   i_instruction == 8'h03 ?
+                   // LD,C - put data in RAM[addr] in C. addr is next word in ram
+                   i_instruction == 16'h0003 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_MI | c_MDRO :
-                     i_step == 'h7 ? c_RO | c_CRI | c_ADV:
+                     i_step == 'h3 ? c_RO | c_CRI | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // STA - put A in RAM[addr]. addr is next 2 bytes in ram
-                   i_instruction == 8'h04 ?
+                   // ST,A - put A in RAM[addr]. addr is next word in ram
+                   i_instruction == 16'h0004 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_MI | c_MDRO :
-                     i_step == 'h7 ? c_RI | c_ARO | c_ADV:
+                     i_step == 'h3 ? c_RI | c_ARO | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // STT - put T in RAM[addr]. addr is next 2 bytes in ram
-                   i_instruction == 8'h05 ?
+                   // ST,T - put T in RAM[addr]. addr is next word in ram
+                   i_instruction == 16'h0005 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_MI | c_MDRO :
-                     i_step == 'h7 ? c_RI | c_TRO | c_ADV:
+                     i_step == 'h3 ? c_RI | c_TRO | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // STB - put B in RAM[addr]. addr is next 2 bytes in ram
-                   i_instruction == 8'h06 ?
+                   // ST,B - put B in RAM[addr]. addr is next word in ram
+                   i_instruction == 16'h0006 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_MI | c_MDRO :
-                     i_step == 'h7 ? c_RI | c_BRO | c_ADV:
+                     i_step == 'h3 ? c_RI | c_BRO | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // LDT,A - put data in RAM[T] in A.
+                   i_instruction == 16'h0007 ?
+                     i_step == 'h2 ? c_MI | c_TRO :
+                     i_step == 'h3 ? c_RO | c_ARI | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // LDT,B - put data in RAM[T] in B.
+                   i_instruction == 16'h0008 ?
+                     i_step == 'h2 ? c_MI | c_TRO :
+                     i_step == 'h3 ? c_RO | c_BRI | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // LDT,C - put data in RAM[T] in C.
+                   i_instruction == 16'h0009 ?
+                     i_step == 'h2 ? c_MI | c_TRO :
+                     i_step == 'h3 ? c_RO | c_CRI | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // STT,A - put data in A in RAM[T].
+                   i_instruction == 16'h000a ?
+                     i_step == 'h2 ? c_MI | c_TRO :
+                     i_step == 'h3 ? c_RI | c_ARO | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // STT,B - put data in B in RAM[T].
+                   i_instruction == 16'h000b ?
+                     i_step == 'h2 ? c_MI | c_TRO :
+                     i_step == 'h3 ? c_RI | c_BRO | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // STT,C - put data in C in RAM[T].
+                   i_instruction == 16'h000c ?
+                     i_step == 'h2 ? c_MI | c_TRO :
+                     i_step == 'h3 ? c_RI | c_CRO | c_ADV :
                      SHOULD_NEVER_REACH:
                    // STC - put C in RAM[addr]. addr is next 2 bytes in ram
-                   i_instruction == 8'h07 ?
+                   i_instruction == 16'h000d ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_MI | c_MDRO :
-                     i_step == 'h7 ? c_RI | c_CRO | c_ADV:
+                     i_step == 'h3 ? c_RI | c_CRO | c_ADV :
                      SHOULD_NEVER_REACH:
                    // MOVA,T - put A in T.
-                   i_instruction == 8'h08 ?
+                   i_instruction == 16'h000e ?
                      i_step == 'h2 ? c_ARO | c_TRI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVA,B - put A in B.
-                   i_instruction == 8'h09 ?
+                   i_instruction == 16'h000f ?
                      i_step == 'h2 ? c_ARO | c_BRI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVA,C - put A in C.
-                   i_instruction == 8'h0a ?
+                   i_instruction == 16'h0010 ?
                      i_step == 'h2 ? c_ARO | c_CRI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVT,A - put T in A.
-                   i_instruction == 8'h0b ?
+                   i_instruction == 16'h0011 ?
                      i_step == 'h2 ? c_TRO | c_ARI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVT,B - put T in B.
-                   i_instruction == 8'h0c ?
+                   i_instruction == 16'h0012 ?
                      i_step == 'h2 ? c_TRO | c_BRI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVT,C - put T in C.
-                   i_instruction == 8'h0d ?
+                   i_instruction == 16'h0013 ?
                      i_step == 'h2 ? c_TRO | c_CRI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVB,A - put B in A.
-                   i_instruction == 8'h0e ?
+                   i_instruction == 16'h0014 ?
                      i_step == 'h2 ? c_BRO | c_ARI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVB,T - put B in T .
-                   i_instruction == 8'h0f ?
+                   i_instruction == 16'h0015 ?
                      i_step == 'h2 ? c_BRO | c_TRI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVB,C - put B in C.
-                   i_instruction == 8'h10 ?
+                   i_instruction == 16'h0016 ?
                      i_step == 'h2 ? c_BRO | c_CRI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVC,A - put C in A.
-                   i_instruction == 8'h11 ?
+                   i_instruction == 16'h0017 ?
                      i_step == 'h2 ? c_CRO | c_ARI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVC,T - put C in T.
-                   i_instruction == 8'h12 ?
+                   i_instruction == 16'h0018 ?
                      i_step == 'h2 ? c_CRO | c_TRI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // MOVC,B - put C in B.
-                   i_instruction == 8'h13 ?
+                   i_instruction == 16'h0019 ?
                      i_step == 'h2 ? c_CRO | c_BRI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // PUSH A
-                   i_instruction == 8'h14 ?
+                   // PUSH,A
+                   i_instruction == 16'h001a ?
                      i_step == 'h2 ? c_SPU | c_ARO | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // POP A
-                   i_instruction == 8'h15 ?
+                   // POP,A
+                   i_instruction == 16'h001b ?
                      i_step == 'h2 ? c_SPO | c_SO | c_ARI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // PUSH T
-                   i_instruction == 8'h16 ?
+                   // PUSH,T
+                   i_instruction == 16'h001c ?
                      i_step == 'h2 ? c_SPU | c_TRO | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // POP T
-                   i_instruction == 8'h17 ?
+                   // POP,T
+                   i_instruction == 16'h001d ?
                      i_step == 'h2 ? c_SPO | c_SO | c_TRI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // PUSH B
-                   i_instruction == 8'h18 ?
+                   // PUSH,B
+                   i_instruction == 16'h001e ?
                      i_step == 'h2 ? c_SPU | c_BRO | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // POP B
-                   i_instruction == 8'h19 ?
+                   // POP,B
+                   i_instruction == 16'h001f ?
                      i_step == 'h2 ? c_SPO | c_SO | c_BRI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // PUSH C
-                   i_instruction == 8'h1a ?
+                   // PUSH,C
+                   i_instruction == 16'h0020 ?
                      i_step == 'h2 ? c_SPU | c_CRO | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // POP C
-                   i_instruction == 8'h1b ?
+                   // POP,C
+                   i_instruction == 16'h0021 ?
                      i_step == 'h2 ? c_SPO | c_SO | c_CRI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // PUSH Program Counter - note that when we pop we increment the counter 3 times so this should almost always be immediately followed by a jump. then a pop would bring us to the following expression
-                   i_instruction == 8'h1c ?
+                   // PUSH,PC - note that when we pop we increment the counter 2 times so this should almost always be immediately followed by a jump. then a pop would bring us to the following expression
+                   i_instruction == 16'h0022 ?
                      i_step == 'h2 ? c_SPU | c_CO | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // POP Program Counter - note we increment the counter three times to get past the jump instruction we presumably did just after pushing
-                   i_instruction == 8'h1d ?
+                   // POP,PC - note we increment the counter 2 times to get past the jump instruction we presumably did just after pushing
+                   i_instruction == 16'h0023 ?
                      i_step == 'h2 ? c_SPO | c_SO | c_J :
                      i_step == 'h3 ? c_CE :
-                     i_step == 'h4 ? c_CE :
-                     i_step == 'h5 ? c_CE | c_ADV :
+                     i_step == 'h4 ? c_CE | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // PUSH Memory Data Register
-                   i_instruction == 8'h1e ?
+                   // PUSH,MDR
+                   i_instruction == 16'h0024 ?
                      i_step == 'h2 ? c_SPU | c_MDRO | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // POP Memory Data Register
-                   i_instruction == 8'h1f ?
-                     i_step == 'h2 ? c_SPO | c_SO | c_MDRLL | c_MDRLU | c_ADV :
+                   // POP,MDR
+                   i_instruction == 16'h0025 ?
+                     i_step == 'h2 ? c_SPO | c_SO | c_MDRI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // OUTA
-                   i_instruction == 8'h20 ?
+                   // OUT,A
+                   i_instruction == 16'h0026 ?
                      i_step == 'h2      ? c_ARO | c_OI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // OUTT
-                   i_instruction == 8'h21 ?
+                   // OUT,T
+                   i_instruction == 16'h0027 ?
                      i_step == 'h2      ? c_TRO | c_OI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // OUTB
-                   i_instruction == 8'h22 ?
+                   // OUT,B
+                   i_instruction == 16'h0028 ?
                      i_step == 'h2      ? c_BRO | c_OI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // OUTC
-                   i_instruction == 8'h23 ?
+                   // OUT,C
+                   i_instruction == 16'h0029 ?
                      i_step == 'h2      ? c_CRO | c_OI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // LDI,A - data to A. data is the next 1 byte of ram
-                   i_instruction == 8'h24 ?
+                   i_instruction == 16'h002a ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_ARI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // LDI,B - data to B. data is the next 1 byte of ram
-                   i_instruction == 8'h25 ?
+                   i_instruction == 16'h002b ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_BRI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // LDI,C - data to C. data is the next 1 byte of ram
-                   i_instruction == 8'h26 ?
+                   i_instruction == 16'h002c ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_CRI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // JUMP - jump to RAM[addr]. addr is the next 2 bytes of RAM
-                   i_instruction == 8'h27 ?
+                   // JUMP - jump to RAM[addr]. addr is the next word of RAM
+                   i_instruction == 16'h002d ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_J  | c_MDRO | c_ADV:
+                     i_step == 'h3 ? c_RO | c_MDRI :
+                     i_step == 'h5 ? c_J  | c_MDRO | c_ADV:
                      SHOULD_NEVER_REACH :
-                   // JIZ - jump to RAM[addr] if zero flag is set. addr is the next 2 bytes of RAM
-                   i_instruction == 8'h28 ?
-                     i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE | (i_zero ? {CONTROL_WORD_WIDTH{1'b0}} : c_ADV) :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_J  | c_MDRO | c_ADV:
+                   // JIZ - jump to RAM[addr] if zero flag is set. addr is the next word of RAM
+                   i_instruction == 16'h002e ?
+                     i_step == 'h2 ? c_MI | c_CO | c_CE | (i_zero ? {CONTROL_WORD_WIDTH{1'b0}} : c_ADV) :
+                     i_step == 'h3 ? c_RO | c_MDRI :
+                     i_step == 'h4 ? c_J  | c_MDRO | c_ADV:
                      SHOULD_NEVER_REACH :
-                   // JIC - jump to RAM[addr] if zero flag is set. addr is the next 2 bytes of RAM
-                   i_instruction == 8'h29 ?
-                     i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE | (i_carry ? {CONTROL_WORD_WIDTH{1'b0}} : c_ADV) :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_J  | c_MDRO | c_ADV:
+                   // JIC - jump to RAM[addr] if zero flag is set. addr is the next word of RAM
+                   i_instruction == 16'h002f ?
+                     i_step == 'h2 ? c_MI | c_CO | c_CE | (i_carry ? {CONTROL_WORD_WIDTH{1'b0}} : c_ADV) :
+                     i_step == 'h3 ? c_RO | c_MDRI :
+                     i_step == 'h4 ? c_J  | c_MDRO | c_ADV:
                      SHOULD_NEVER_REACH :
-                   // JIO - jump to RAM[addr] if odd flag is set. addr is the next 2 bytes of RAM
-                   i_instruction == 8'h2a ?
-                     i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE | (i_odd ? {CONTROL_WORD_WIDTH{1'b0}} : c_ADV) :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_J  | c_MDRO | c_ADV:
+                   // JIO - jump to RAM[addr] if odd flag is set. addr is the next word of RAM
+                   i_instruction == 16'h0030 ?
+                     i_step == 'h2 ? c_MI | c_CO | c_CE | (i_odd ? {CONTROL_WORD_WIDTH{1'b0}} : c_ADV) :
+                     i_step == 'h3 ? c_RO | c_MDRI :
+                     i_step == 'h4 ? c_J  | c_MDRO | c_ADV:
                      SHOULD_NEVER_REACH :
-                   // ADDI - add A to data, store into TMP. data is next 1 byte of ram
-                   i_instruction == 8'h30 ?
+                   // ADDI - add A to data, store into TMP. data is next word of ram
+                   i_instruction == 16'h0031 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_TRI :
                      i_step == 'h4 ? c_EO | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // SUBI - subtract A by data, store into TMP. data is next 1 byte of ram
-                   i_instruction == 8'h31 ?
+                   // SUBI - subtract A by data, store into TMP. data is next word of ram
+                   i_instruction == 16'h0032 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_TRI :
                      i_step == 'h4 ? c_EO | c_SU | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // ADD - add A to RAM[addr], storing into TMP. addr is next 2 bytes in ram
-                   i_instruction == 8'h32 ?
-                     i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_MI | c_MDRO :
-                     i_step == 'h7 ? c_RO | c_TRI :
-                     i_step == 'h8 ? c_EO | c_TRI | c_EL | c_ADV :
-                     SHOULD_NEVER_REACH:
-                   // SUB - add A to RAM[addr], storing into TMP. addr is next 2 bytes in ram
-                   i_instruction == 8'h33 ?
-                     i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRLL :
-                     i_step == 'h4 ? c_MI | c_CO | c_CE :
-                     i_step == 'h5 ? c_RO | c_MDRLU | c_MDRMLTU :
-                     i_step == 'h6 ? c_MI | c_MDRO :
-                     i_step == 'h7 ? c_RO | c_TRI :
-                     i_step == 'h8 ? c_EO | c_SU | c_TRI | c_EL | c_ADV :
-                     SHOULD_NEVER_REACH:
-                   // ADDB - add A to B, storing into TMP.
-                   i_instruction == 8'h34 ?
+                   // ADD,B - add A to B, storing into TMP.
+                   i_instruction == 16'h0033 ?
                      i_step == 'h2 ? c_BRO | c_TRI :
                      i_step == 'h3 ? c_EO | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // SUBB - subtract A by B, storing in TMP
-                   i_instruction == 8'h35 ?
+                   // SUB,B - subtract A by B, storing in TMP
+                   i_instruction == 16'h0034 ?
                      i_step == 'h2 ? c_BRO | c_TRI :
                      i_step == 'h3 ? c_EO | c_SU | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // ADDC - add A to C, storing into TMP.
-                   i_instruction == 8'h36 ?
+                   // ADD,C - add A to C, storing into TMP.
+                   i_instruction == 16'h0035 ?
                      i_step == 'h2 ? c_CRO | c_TRI :
                      i_step == 'h3 ? c_EO | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // SUBC - subtract A by C, storing in TMP
-                   i_instruction == 8'h37 ?
+                   // SUB,C - subtract A by C, storing in TMP
+                   i_instruction == 16'h0036 ?
                      i_step == 'h2 ? c_CRO | c_TRI :
                      i_step == 'h3 ? c_EO | c_SU | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // HALT PROGRAM
-                   i_instruction == 8'hff ?
+                   i_instruction == 16'hffff ?
                      i_step == 'h2 ? c_HLT :
                      SHOULD_NEVER_REACH :
                    // NOP - do nothing and just advance counter

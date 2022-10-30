@@ -2,25 +2,25 @@
 
 module Top #(
   parameter BUS_WIDTH   = 16,
-  parameter A_REG_WIDTH = 8,
-  parameter T_REG_WIDTH = 8,
-  parameter B_REG_WIDTH = 8,
-  parameter C_REG_WIDTH = 8,
-  parameter ALU_WIDTH   = 8,
-  parameter OUT_WIDTH   = 8,
+  parameter A_REG_WIDTH = 16,
+  parameter T_REG_WIDTH = 16,
+  parameter B_REG_WIDTH = 16,
+  parameter C_REG_WIDTH = 16,
+  parameter ALU_WIDTH   = 16,
+  parameter OUT_WIDTH   = 16,
 
   parameter MEMORY_DATA_REG_WIDTH = 16,
 
   parameter STACK_WIDTH           = 16,
-  parameter STACK_DEPTH           = 16,
+  parameter STACK_DEPTH           = 512,
 
   parameter PROGRAM_COUNTER_WIDTH = 16,
 
   parameter RAM_DEPTH         = 2**PROGRAM_COUNTER_WIDTH,
-  parameter RAM_WIDTH         = 8,
+  parameter RAM_WIDTH         = 16,
 
-  parameter INSTRUCTION_WIDTH  = 8,
-  parameter INSTRUCTION_STEPS  = 16,
+  parameter INSTRUCTION_WIDTH  = 16,
+  parameter INSTRUCTION_STEPS  = 32,
 
   parameter FILE               = "ram.hex",
 
@@ -100,6 +100,7 @@ module Top #(
     .B_REG_OUT_WIDTH          (B_REG_WIDTH),
     .C_REG_OUT_WIDTH          (C_REG_WIDTH),
     .MEMORY_DATA_REG_OUT_WIDTH(MEMORY_DATA_REG_WIDTH),
+    .MEMORY_ADDR_REG_OUT_WIDTH(ADDRESS_WIDTH),
     .ALU_OUT_WIDTH            (ALU_WIDTH),
     .STACK_OUT_WIDTH          (STACK_WIDTH),
     .RAM_OUT_WIDTH            (RAM_WIDTH),
@@ -121,6 +122,8 @@ module Top #(
     .i_ram_data            (ram_data),
     .i_memory_data_reg_out (control_word[MDRO_POS]),
     .i_memory_data_reg_data(memory_data_reg),
+    .i_memory_addr_reg_out (control_word[MO_POS]),
+    .i_memory_addr_reg_data(memory_address),
     .i_program_counter_out (control_word[CO_POS]),
     .i_program_counter_data(program_counter),
     .o_bus_out             (bus_out)
@@ -221,13 +224,12 @@ module Top #(
     .o_data       (c_reg)
   );
 
-  HalfLoadableRegister #(
+  Register #(
     .WIDTH(MEMORY_DATA_REG_WIDTH)
-  ) inst_HalfLoadableRegister (
+  ) inst_Register_Memory_Data_Reg (
     .clk                    (clk),
     .clk_en                 (clk_en),
-    .i_load_enable          ({control_word[MDRLU_POS], control_word[MDRLL_POS]}),
-    .i_load_upper_from_lower(control_word[MDRMLTU_POS]),
+    .i_load_enable          (control_word[MDRI_POS]),
     .i_load_data            (bus_out[MEMORY_DATA_REG_WIDTH-1:0]),
     .o_data                 (memory_data_reg)
   );

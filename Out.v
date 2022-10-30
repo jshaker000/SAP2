@@ -6,7 +6,7 @@
 `default_nettype none
 
 module Out #(
-  parameter WIDTH = 8
+  parameter WIDTH = 16
 )(
   input                    clk,
   input                    clk_en,
