@@ -64,40 +64,40 @@ module Instruction_Decoder (
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RI | c_BRO | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // LDT,A - put data in RAM[T] in A.
+                   // STC - put C in RAM[addr]. addr is next word in RAM
                    i_instruction == 16'h0007 ?
+                     i_step == 'h2 ? c_MI | c_CO | c_CE :
+                     i_step == 'h3 ? c_RI | c_CRO | c_ADV :
+                   // LDT,A - put data in RAM[T] in A.
+                   i_instruction == 16'h0008 ?
                      i_step == 'h2 ? c_MI | c_TRO :
                      i_step == 'h3 ? c_RO | c_ARI | c_ADV :
                      SHOULD_NEVER_REACH:
                    // LDT,B - put data in RAM[T] in B.
-                   i_instruction == 16'h0008 ?
+                   i_instruction == 16'h0009 ?
                      i_step == 'h2 ? c_MI | c_TRO :
                      i_step == 'h3 ? c_RO | c_BRI | c_ADV :
                      SHOULD_NEVER_REACH:
                    // LDT,C - put data in RAM[T] in C.
-                   i_instruction == 16'h0009 ?
+                   i_instruction == 16'h000a ?
                      i_step == 'h2 ? c_MI | c_TRO :
                      i_step == 'h3 ? c_RO | c_CRI | c_ADV :
                      SHOULD_NEVER_REACH:
                    // STT,A - put data in A in RAM[T].
-                   i_instruction == 16'h000a ?
+                   i_instruction == 16'h000b ?
                      i_step == 'h2 ? c_MI | c_TRO :
                      i_step == 'h3 ? c_RI | c_ARO | c_ADV :
                      SHOULD_NEVER_REACH:
                    // STT,B - put data in B in RAM[T].
-                   i_instruction == 16'h000b ?
+                   i_instruction == 16'h000c ?
                      i_step == 'h2 ? c_MI | c_TRO :
                      i_step == 'h3 ? c_RI | c_BRO | c_ADV :
                      SHOULD_NEVER_REACH:
                    // STT,C - put data in C in RAM[T].
-                   i_instruction == 16'h000c ?
+                   i_instruction == 16'h000d ?
                      i_step == 'h2 ? c_MI | c_TRO :
                      i_step == 'h3 ? c_RI | c_CRO | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // STC - put C in RAM[addr]. addr is next 2 bytes in ram
-                   i_instruction == 16'h000d ?
-                     i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RI | c_CRO | c_ADV :
                      SHOULD_NEVER_REACH:
                    // MOVA,T - put A in T.
                    i_instruction == 16'h000e ?
