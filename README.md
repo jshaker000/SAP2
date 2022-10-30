@@ -15,10 +15,9 @@ This computer is generally based on the SAP1 archetecture, but has these enhance
 
     1. Extended RAM to wordize of 1-byte, 64k
     2. Extended Program Counter, Memory Address Register, Bus to 16 bits to facilitate
-    3. Added a Memory Data Register which can use the bus to load the lower 8 bits into its lower 8 bits, the lower 8 bits into its upper 8 bits, and or the upper 8 bits into its upper 8 bits. That allows us to store memory addresses in memory in two consecutive bytes.
-    4. Added stack functionality
-    5. Added additional registers: Temp, B, C and added move instructions for each of them
-    6. Added ability to address into memory using registers, essentially allowing for array access
+    3. Added stack functionality
+    4. Added additional registers: Memory Data Register, Temp, B, C and added move instructions for each of them
+    5. Added ability to address into memory using registers, essentially allowing for array access
 
 Example programs using these are in `ram.hex` and `fib.ram.hex` which demonstrate doing multiplication in a subroutine using the stack and in a loop and a faster way to compute the fibbonacci sequence than on the SAP1
 using the extra registers rather than needing to use RAM to store temporary results.
@@ -26,6 +25,10 @@ using the extra registers rather than needing to use RAM to store temporary resu
 ## Installation and Usage
 This is tested to work on major Linux distros. You will need to install Verilator, gcc, and
 ncurses (some distros will seperate into devel and non devel, you need the devel version).
+
+Currently, reading through `Instruction_Decoder.v` and grepping through for each `i_instruction` line is the
+best way to see the whole ISA. That, combined with some of the example programs, should help someone get started
+simulating.
 
 From there, simply running *make* should be enough to verilate, build, and run your bench.
 You should place your RAM file in "ram.hex". I've left an example in the repo.
