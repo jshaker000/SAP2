@@ -1,0 +1,92 @@
+/* verilator lint_off UNUSED */
+  // pnemonics for control words
+  localparam CONTROL_WORD_WIDTH = 29;
+
+  localparam HLT_POS = 28; // Halt
+  localparam ADV_POS = 27; // Advance Instruction Counter to Next Instruction
+
+  localparam SO_POS  = 26; // stack output enable
+  localparam SPO_POS = 25; // stack pop
+  localparam SPU_POS = 24; // stack push
+
+  localparam MDRLL_POS   = 23; // memory data register load lower
+  localparam MDRLU_POS   = 22; // memory data register load upper
+  localparam MDRMLTU_POS = 21; // memory data register mux lower bus to upper
+  localparam MDRO_POS    = 20; // memory data register out
+
+  localparam MI_POS  = 19; // mem address reg in
+
+  localparam RI_POS  = 18; // ram data in
+  localparam RO_POS  = 17; // ram data out
+
+  localparam II_POS  = 16; // instruction reg out
+  localparam IO_POS  = 15; // instruction reg in
+
+  localparam CRI_POS  = 14; // c register in
+  localparam CRO_POS  = 13; // c register out
+
+  localparam BRI_POS  = 12; // b register in
+  localparam BRO_POS  = 11; // b register out
+
+  localparam TRI_POS  = 10; // temp register in
+  localparam TRO_POS  = 9;  // temp register out
+
+  localparam ARI_POS  = 8; // a register in
+  localparam ARO_POS  = 7; // a register out
+
+  localparam SU_POS  = 6; // alu subtract
+  localparam EL_POS  = 5; // alu latch flags
+  localparam EO_POS  = 4; // alu out
+
+  localparam OI_POS  = 3; // out register in
+
+  localparam CE_POS  = 2; // program counter enable (increment)
+  localparam CO_POS  = 1; // program counter out
+
+  localparam J_POS   = 0; // jump
+
+  //
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_HLT = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << HLT_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_ADV = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << ADV_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SO    = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SO_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SPO   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SPO_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SPU   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SPU_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_MDRLL   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MDRLL_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_MDRLU   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MDRLU_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_MDRMLTU = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MDRMLTU_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_MDRO    = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MDRO_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_MI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MI_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_RI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << RI_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_RO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << RO_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_II  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << II_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_IO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << IO_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_CRI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << CRI_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_CRO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << CRO_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_BRI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << BRI_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_BRO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << BRO_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_TRI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << TRI_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_TRO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << TRO_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_ARI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << ARI_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_ARO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << ARO_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_EO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << EO_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SU  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SU_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_EL  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << EL_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_OI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << OI_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_CE  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << CE_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_CO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << CO_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_J   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << J_POS;
+/* verilator lint_on UNUSED */
