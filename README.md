@@ -13,10 +13,10 @@ The bench is written in C++ and is compiled using [Verilator](https://www.veripo
 ## Theory of Operation
 This computer is generally based on the SAP1 archetecture, but has these enhancements:
 
-    1. Extended RAM to wordize of 1-byte, 64k
-    2. Extended Program Counter, Memory Address Register, Bus to 16 bits to facilitate
+    1. Extended RAM to wordize of 16 bits, depth of 64k
+    2. Extended all registers, including Program Counter, Memory Address Register, Bus to 16 bits to facilitate
     3. Added stack functionality
-    4. Added additional registers: Memory Data Register, Temp, B, C and added move instructions for each of them
+    4. Added additional registers: Temp, B, C and added move instructions for each of them
     5. Added ability to address into memory using registers, essentially allowing for array access
 
 Example programs using these are in `ram.hex` and `fib.ram.hex` which demonstrate doing multiplication in a subroutine using the stack and in a loop and a faster way to compute the fibbonacci sequence than on the SAP1

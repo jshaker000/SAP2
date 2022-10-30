@@ -13,7 +13,6 @@ module Bus #(
   parameter C_REG_OUT_WIDTH           = 8,
   parameter RAM_OUT_WIDTH             = 8,
   parameter STACK_OUT_WIDTH           = 16,
-  parameter MEMORY_DATA_REG_OUT_WIDTH = 16,
   parameter MEMORY_ADDR_REG_OUT_WIDTH = 16,
   parameter ALU_OUT_WIDTH             = 8,
   parameter PROGRAM_COUNTER_OUT_WIDTH = 16
@@ -25,7 +24,6 @@ module Bus #(
   input wire i_ram_out,
   input wire i_stack_out,
   input wire i_memory_addr_reg_out,
-  input wire i_memory_data_reg_out,
   input wire i_alu_out,
   input wire i_program_counter_out,
 
@@ -35,7 +33,6 @@ module Bus #(
   input wire           [C_REG_OUT_WIDTH-1:0] i_c_reg_data,
   input wire           [STACK_OUT_WIDTH-1:0] i_stack_data,
   input wire             [RAM_OUT_WIDTH-1:0] i_ram_data,
-  input wire [MEMORY_DATA_REG_OUT_WIDTH-1:0] i_memory_data_reg_data,
   input wire [MEMORY_ADDR_REG_OUT_WIDTH-1:0] i_memory_addr_reg_data,
   input wire             [ALU_OUT_WIDTH-1:0] i_alu_data,
   input wire [PROGRAM_COUNTER_OUT_WIDTH-1:0] i_program_counter_data,
@@ -56,8 +53,6 @@ module Bus #(
                                                 & {BUS_WIDTH{i_stack_out}};
   wire [BUS_WIDTH-1:0] ram_masked             =  {{BUS_WIDTH-RAM_OUT_WIDTH{1'b0}},            i_ram_data}
                                                 & {BUS_WIDTH{i_ram_out}};
-  wire [BUS_WIDTH-1:0] memory_data_reg_masked =  {{BUS_WIDTH-MEMORY_DATA_REG_OUT_WIDTH{1'b0}},i_memory_data_reg_data}
-                                                & {BUS_WIDTH{i_memory_data_reg_out}};
   wire [BUS_WIDTH-1:0] memory_addr_reg_masked =  {{BUS_WIDTH-MEMORY_ADDR_REG_OUT_WIDTH{1'b0}},i_memory_addr_reg_data}
                                                 & {BUS_WIDTH{i_memory_addr_reg_out}};
   wire [BUS_WIDTH-1:0] alu_masked             =  {{BUS_WIDTH-ALU_OUT_WIDTH{1'b0}},            i_alu_data}
@@ -68,7 +63,6 @@ module Bus #(
   assign o_bus_out = a_reg_masked           | t_reg_masked |
                      b_reg_masked           | c_reg_masked |
                      stack_masked           | ram_masked   |
-                     memory_data_reg_masked | memory_addr_reg_masked |
-                     alu_masked             | program_counter_masked;
+                     memory_addr_reg_masked | alu_masked   | program_counter_masked;
 
 endmodule

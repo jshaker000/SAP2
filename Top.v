@@ -9,8 +9,6 @@ module Top #(
   parameter ALU_WIDTH   = 16,
   parameter OUT_WIDTH   = 16,
 
-  parameter MEMORY_DATA_REG_WIDTH = 16,
-
   parameter STACK_WIDTH           = 16,
   parameter STACK_DEPTH           = 512,
 
@@ -64,7 +62,6 @@ module Top #(
   wire                       [T_REG_WIDTH-1:0] t_reg;
   wire                       [B_REG_WIDTH-1:0] b_reg;
   wire                       [C_REG_WIDTH-1:0] c_reg;
-  wire             [MEMORY_DATA_REG_WIDTH-1:0] memory_data_reg;
 
   wire                       [STACK_WIDTH-1:0] stack;
 
@@ -99,7 +96,6 @@ module Top #(
     .T_REG_OUT_WIDTH          (T_REG_WIDTH),
     .B_REG_OUT_WIDTH          (B_REG_WIDTH),
     .C_REG_OUT_WIDTH          (C_REG_WIDTH),
-    .MEMORY_DATA_REG_OUT_WIDTH(MEMORY_DATA_REG_WIDTH),
     .MEMORY_ADDR_REG_OUT_WIDTH(ADDRESS_WIDTH),
     .ALU_OUT_WIDTH            (ALU_WIDTH),
     .STACK_OUT_WIDTH          (STACK_WIDTH),
@@ -120,8 +116,6 @@ module Top #(
     .i_stack_data          (stack),
     .i_ram_out             (control_word[RO_POS]),
     .i_ram_data            (ram_data),
-    .i_memory_data_reg_out (control_word[MDRO_POS]),
-    .i_memory_data_reg_data(memory_data_reg),
     .i_memory_addr_reg_out (control_word[MO_POS]),
     .i_memory_addr_reg_data(memory_address),
     .i_program_counter_out (control_word[CO_POS]),
@@ -222,16 +216,6 @@ module Top #(
     .i_load_enable(control_word[CRI_POS]),
     .i_load_data  (bus_out[C_REG_WIDTH-1:0]),
     .o_data       (c_reg)
-  );
-
-  Register #(
-    .WIDTH(MEMORY_DATA_REG_WIDTH)
-  ) inst_Register_Memory_Data_Reg (
-    .clk                    (clk),
-    .clk_en                 (clk_en),
-    .i_load_enable          (control_word[MDRI_POS]),
-    .i_load_data            (bus_out[MEMORY_DATA_REG_WIDTH-1:0]),
-    .o_data                 (memory_data_reg)
   );
 
   Stack #(

@@ -189,13 +189,13 @@ module Instruction_Decoder (
                      i_step == 'h3 ? c_CE :
                      i_step == 'h4 ? c_CE | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // PUSH,MDR
+                   // PUSH,MA
                    i_instruction == 16'h0024 ?
-                     i_step == 'h2 ? c_SPU | c_MDRO | c_ADV :
+                     i_step == 'h2 ? c_SPU | c_MO | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // POP,MDR
+                   // POP,MA
                    i_instruction == 16'h0025 ?
-                     i_step == 'h2 ? c_SPO | c_SO | c_MDRI | c_ADV :
+                     i_step == 'h2 ? c_SPO | c_SO | c_MI | c_ADV :
                      SHOULD_NEVER_REACH :
                    // OUT,A
                    i_instruction == 16'h0026 ?
@@ -231,26 +231,22 @@ module Instruction_Decoder (
                    // JUMP - jump to RAM[addr]. addr is the next word of RAM
                    i_instruction == 16'h002d ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
-                     i_step == 'h3 ? c_RO | c_MDRI :
-                     i_step == 'h5 ? c_J  | c_MDRO | c_ADV:
+                     i_step == 'h3 ? c_RO | c_J | c_ADV :
                      SHOULD_NEVER_REACH :
                    // JIZ - jump to RAM[addr] if zero flag is set. addr is the next word of RAM
                    i_instruction == 16'h002e ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE | (i_zero ? {CONTROL_WORD_WIDTH{1'b0}} : c_ADV) :
-                     i_step == 'h3 ? c_RO | c_MDRI :
-                     i_step == 'h4 ? c_J  | c_MDRO | c_ADV:
+                     i_step == 'h3 ? c_J  | c_RO | c_ADV:
                      SHOULD_NEVER_REACH :
                    // JIC - jump to RAM[addr] if zero flag is set. addr is the next word of RAM
                    i_instruction == 16'h002f ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE | (i_carry ? {CONTROL_WORD_WIDTH{1'b0}} : c_ADV) :
-                     i_step == 'h3 ? c_RO | c_MDRI :
-                     i_step == 'h4 ? c_J  | c_MDRO | c_ADV:
+                     i_step == 'h3 ? c_J  | c_RO | c_ADV:
                      SHOULD_NEVER_REACH :
                    // JIO - jump to RAM[addr] if odd flag is set. addr is the next word of RAM
                    i_instruction == 16'h0030 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE | (i_odd ? {CONTROL_WORD_WIDTH{1'b0}} : c_ADV) :
-                     i_step == 'h3 ? c_RO | c_MDRI :
-                     i_step == 'h4 ? c_J  | c_MDRO | c_ADV:
+                     i_step == 'h3 ? c_J  | c_RO | c_ADV:
                      SHOULD_NEVER_REACH :
                    // ADDI - add A to data, store into TMP. data is next word of ram
                    i_instruction == 16'h0031 ?

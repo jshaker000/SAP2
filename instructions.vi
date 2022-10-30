@@ -1,16 +1,13 @@
 /* verilator lint_off UNUSED */
   // pnemonics for control words
-  localparam CONTROL_WORD_WIDTH = 28;
+  localparam CONTROL_WORD_WIDTH = 26;
 
-  localparam HLT_POS = 27; // Halt
-  localparam ADV_POS = 26; // Advance Instruction Counter to Next Instruction
+  localparam HLT_POS = 25; // Halt
+  localparam ADV_POS = 24; // Advance Instruction Counter to Next Instruction
 
-  localparam SO_POS  = 25; // stack output enable
-  localparam SPO_POS = 24; // stack pop
-  localparam SPU_POS = 23; // stack push
-
-  localparam MDRI_POS    = 22; // memory data register mux lower bus to upper
-  localparam MDRO_POS    = 21; // memory data register out
+  localparam SO_POS  = 23; // stack output enable
+  localparam SPO_POS = 22; // stack pop
+  localparam SPU_POS = 21; // stack push
 
   localparam MI_POS  = 20; // mem address reg in
   localparam MO_POS  = 19; // mem address reg out
@@ -52,9 +49,6 @@
   localparam [CONTROL_WORD_WIDTH-1:0] c_SO    = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SO_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_SPO   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SPO_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_SPU   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SPU_POS;
-
-  localparam [CONTROL_WORD_WIDTH-1:0] c_MDRI    = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MDRI_POS;
-  localparam [CONTROL_WORD_WIDTH-1:0] c_MDRO    = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MDRO_POS;
 
   localparam [CONTROL_WORD_WIDTH-1:0] c_MI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MI_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_MO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MO_POS;
