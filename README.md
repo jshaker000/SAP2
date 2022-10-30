@@ -16,7 +16,7 @@ This computer is generally based on the SAP1 archetecture, but has these enhance
     1. Extended RAM to wordize of 1-byte, 64k
     2. Extended Program Counter, Memory Address Register, Bus to 16 bits to facilitate
     3. Added a Memory Data Register which can use the bus to load the lower 8 bits into its lower 8 bits, the lower 8 bits into its upper 8 bits, and or the upper 8 bits into its upper 8 bits. That allows us to store memory addresses in memory in two consecutive bytes.
-    4. Added strak functionality
+    4. Added stack functionality
     5. Added additional registers: Temp, B, C and added move instructions for each of them
 
 Example programs using these are in `ram.hex` and `fib.ram.hex` which demonstrate doing multiplication in a subroutine using the stack and in a loop and a faster way to compute the fibbonacci sequence than on the SAP1
@@ -47,7 +47,7 @@ You can make more benches and update the makefile appropriately if you like.
 
 ### Compiler
 I'd love to make some scripts that take plain text and can compile to both Instruction\_Decoder.v and also use that file
-to convert instructions into the ram file. Especially if we add a Stack, then having a compiler to automate function calling would be very nice
+to convert instructions into the ram file. Especially with a stack, being able to maintain labels and automate function calling would be great.
 
 ### FPGA Implementation
 #### Output Module
