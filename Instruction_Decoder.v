@@ -213,17 +213,17 @@ module Instruction_Decoder (
                    i_instruction == 16'h0029 ?
                      i_step == 'h2      ? c_CRO | c_OI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // LDI,A - data to A. data is the next 1 byte of ram
+                   // LDI,A - data to A. data is the next word of ram
                    i_instruction == 16'h002a ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_ARI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // LDI,B - data to B. data is the next 1 byte of ram
+                   // LDI,B - data to B. data is the next word of ram
                    i_instruction == 16'h002b ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_BRI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // LDI,C - data to C. data is the next 1 byte of ram
+                   // LDI,C - data to C. data is the next word of ram
                    i_instruction == 16'h002c ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_CRI | c_ADV :
