@@ -182,7 +182,7 @@ module Instruction_Decoder (
                    i_instruction == 8'h1c ?
                      i_step == 'h2 ? c_SPU | c_CO | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // POP Program Counter
+                   // POP Program Counter - note we increment the counter three times to get past the jump instruction we presumably did just after pushing
                    i_instruction == 8'h1d ?
                      i_step == 'h2 ? c_SPO | c_SO | c_J :
                      i_step == 'h3 ? c_CE :
