@@ -19,16 +19,23 @@ This computer is generally based on the SAP1 archetecture, but has these enhance
     4. Added additional registers: Temp, B, C and added move instructions for each of them
     5. Added ability to address into memory using registers, essentially allowing for array access
 
-Example programs using these are in `ram.hex` and `fib.ram.hex` which demonstrate doing multiplication in a subroutine using the stack and in a loop and a faster way to compute the fibbonacci sequence than on the SAP1
-using the extra registers rather than needing to use RAM to store temporary results.
+An example program is attached in `example.asm`, and is automatically assembled by running `make` via `assembler.rb` to generate `ram.hex` unless that file already exists.
+Running make runs the program in `ram.hex` so you can write and assemble your own code there if desired. Note that the assembler currently does not automatically stay in sync
+with the `Instruction_Decoder.v` and will likely need edits if you need to update that file. These two files `assembler.rb` and `Instruction_Decoder.v` kind of show the brains of the
+computer, how it does it and what it does.
+
+There is an additional example program in `fib.asm`.
+
+The assembler file has a lot of comments explaining the valid syntax for it.
+
+The control words are defined in `control_words.vi` to be shared between other files as needed.
 
 ## Installation and Usage
 This is tested to work on major Linux distros. You will need to install Verilator, gcc, and
 ncurses (some distros will seperate into devel and non devel, you need the devel version).
 
-Currently, reading through `Instruction_Decoder.v` and grepping through for each `i_instruction` line is the
-best way to see the whole ISA. That, combined with some of the example programs, should help someone get started
-simulating.
+You will also need `ruby` installed to run the assembler, though I suppose it isnt technically needed if you dont
+mind hand writing machine code.
 
 From there, simply running *make* should be enough to verilate, build, and run your bench.
 You should place your RAM file in "ram.hex". I've left an example in the repo.

@@ -14,7 +14,7 @@ module Instruction_Decoder (
   parameter  INSTRUCTION_WIDTH  = 16;
   parameter  INSTRUCTION_STEPS  = 32;
 
-  `include "instructions.vi"
+  `include "control_words.vi"
 
   localparam STEP_WIDTH = $clog2(INSTRUCTION_STEPS);
 
@@ -228,7 +228,7 @@ module Instruction_Decoder (
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_CRI | c_ADV :
                      SHOULD_NEVER_REACH :
-                   // JUMP - jump to RAM[addr]. addr is the next word of RAM
+                   // JMP - jump to RAM[addr]. addr is the next word of RAM
                    i_instruction == 16'h002d ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_J | c_ADV :

@@ -1,0 +1,12 @@
+INIT:
+  LDIA 0
+  LDIB 1
+LOOP:
+  ADDB
+  JIC HALT
+  OUTT
+  MOVBA
+  MOVTB
+  JMP LOOP
+HALT:
+  halt

@@ -1,6 +1,7 @@
 MODULE_NAME    := Top
 VERILATED_NAME := V${MODULE_NAME}
 RAMFILE        := ram.hex
+ASSEMBLER      := assembler.rb
 OBJ_DIR        := obj_dir
 LD_FLAGS       := -lncurses -flto
 CFLAGS         := --std=c++11 -O3 -flto
@@ -13,13 +14,13 @@ run: all
 
 all: ${OBJ_DIR}/${VERILATED_NAME} ${RAMFILE}
 
-${RAMFILE} : % : %.ex
-	if [ ! -f $@ ]; then cp $< $@; else touch $@; fi
+${RAMFILE} : example.asm ${ASSEMBLER}
+	if [ ! -f $@ ]; then ./${ASSEMBLER} -i $< -o $@ ; else touch $@; fi
 
 ${OBJ_DIR}/${VERILATED_NAME} : % : %.mk ${MODULE_NAME}.cpp
 	cd ${OBJ_DIR}; make -f $(patsubst ${OBJ_DIR}/%,%,$<)
 
-${OBJ_DIR}/${VERILATED_NAME}.mk : ${MODULE_NAME}.v $(filter-out ${MODULE_NAME}, *.v)
+${OBJ_DIR}/${VERILATED_NAME}.mk : ${MODULE_NAME}.v $(filter-out ${MODULE_NAME}, *.v) *.vi
 	verilator ${V_FLAGS} -cc $< --exe $(patsubst %.v,%.cpp,$<) -LDFLAGS "${LD_FLAGS}" -CFLAGS "${CFLAGS}"
 
 clean:
