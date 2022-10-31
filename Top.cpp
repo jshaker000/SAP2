@@ -58,7 +58,7 @@ int main(int argc, char**argv)
 {
     const bool          dump_traces = (GetEnv("DUMPTRACES") == "1") || (GetEnv("DUMP_TRACES") == "1");
     const std::string   dp_f        = (GetEnv("DUMP_F") != "")    ? GetEnv("DUMP_F")                : "top_trace.vcd";
-    const std::uint64_t max_steps   = (GetEnv("MAX_STEPS") != "") ? std::atoll(GetEnv("MAX_STEPS").c_str()) : 3500000;
+    const std::uint64_t max_steps   = (GetEnv("MAX_STEPS") != "") ? std::atoll(GetEnv("MAX_STEPS").c_str()) : 35000000;
     Verilated::commandArgs(argc,argv);
     VTop          *tb  = new VTop;
     if (tb == nullptr)

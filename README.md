@@ -24,7 +24,7 @@ Running make runs the program in `ram.hex` so you can write and assemble your ow
 with the `Instruction_Decoder.v` and will likely need edits if you need to update that file. These two files `assembler.rb` and `Instruction_Decoder.v` kind of show the brains of the
 computer, how it does it and what it does.
 
-There is an additional example program in `fib.asm`.
+There is an additional example program in `fib.asm` to print the fibbonacci sequence and `primes.asm` to print the primes.
 
 The assembler file has a lot of comments explaining the valid syntax for it.
 

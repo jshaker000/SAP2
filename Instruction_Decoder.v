@@ -68,6 +68,7 @@ module Instruction_Decoder (
                    i_instruction == 16'h0007 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RI | c_CRO | c_ADV :
+                     SHOULD_NEVER_REACH :
                    // LDT,A - put data in RAM[T] in A.
                    i_instruction == 16'h0008 ?
                      i_step == 'h2 ? c_MI | c_TRO :
@@ -97,7 +98,6 @@ module Instruction_Decoder (
                    i_instruction == 16'h000d ?
                      i_step == 'h2 ? c_MI | c_TRO :
                      i_step == 'h3 ? c_RI | c_CRO | c_ADV :
-                     SHOULD_NEVER_REACH:
                      SHOULD_NEVER_REACH:
                    // MOVA,T - put A in T.
                    i_instruction == 16'h000e ?
