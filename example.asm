@@ -51,12 +51,12 @@ RUN:
 LOOP_5_TIMES_TABLES:
   ; ADD 2**16 (1 - 1/5). If this carries, we know we are done
   ADDI 52428
-  JIC HALT
+  JIC HLT
   PUSHPC
   JMP MULT_START
   OUTT
   ADDI 1
   MOVTA
   JMP LOOP_5_TIMES_TABLES
-HALT:
+HLT:
   HALT

@@ -3,10 +3,10 @@ INIT:
   LDIB 1
 LOOP:
   ADDB
-  JIC HALT
+  JIC HLT
   OUTT
   MOVBA
   MOVTB
   JMP LOOP
-HALT:
-  halt
+HLT:
+  HALT
