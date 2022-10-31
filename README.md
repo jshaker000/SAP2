@@ -59,10 +59,6 @@ You can make more benches and update the makefile appropriately if you like.
 
 ## Further Work
 
-### Compiler
-I'd love to make some scripts that take plain text and can compile to both Instruction\_Decoder.v and also use that file
-to convert instructions into the ram file. Especially with a stack, being able to maintain labels and automate function calling would be great.
-
 ### FPGA Implementation
 #### Output Module
 You could implement a pipelined Double-Dabble Module and tie that output then the 7seg decoder. Many FPGAs then will have a scheme
