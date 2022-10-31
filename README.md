@@ -2,7 +2,7 @@
 
 ## Purpose:
 
-This collection of RTL is meant to model an 8-bit SAP2 computer as explained by Albert Paul Malvino,
+This collection of RTL is meant to model a 16-bit SAP computer roughly following the explainations by Albert Paul Malvino,
 for an interproduction to the concepts, see my [SAP1](https://github.com/jshaker000/SAP1)
 
 This project was part of my own learning experience of Computer Architecture and Verilog,
@@ -17,7 +17,7 @@ This computer is generally based on the SAP1 archetecture, but has these enhance
     2. Extended all registers, including Program Counter, Memory Address Register, Bus to 16 bits to facilitate
     3. Added stack functionality
     4. Added additional registers: Temp, B, C and added move instructions for each of them
-    5. Added ability to address into memory using registers, essentially allowing for array access
+    5. Added ability to address into memory using registers, essentially allowing for array access and pointer arithmatic
 
 An example program is attached in `example.asm`, and is automatically assembled by running `make` via `assembler.rb` to generate `ram.hex` unless that file already exists.
 Running make runs the program in `ram.hex` so you can write and assemble your own code there if desired. Note that the assembler currently does not automatically stay in sync
