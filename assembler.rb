@@ -257,7 +257,7 @@ File.open(options.fetch(:output_file), 'w') do |f|
     f.puts op.to_s(16).rjust(RAM_WIDTH_HEX_CHAR, '0')
     f.puts instr[1].to_s(16).rjust(RAM_WIDTH_HEX_CHAR, '0') if instr[1]
   end
-  (RAM_DEPTH - end_of_instructions_addr - 1).times do
+  (RAM_DEPTH - end_of_instructions_addr).times do
     f.puts ''.rjust(RAM_WIDTH_HEX_CHAR, '0')
   end
 end
