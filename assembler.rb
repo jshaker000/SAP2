@@ -13,6 +13,7 @@
 #     RESERVE x[2] y z[3]
 #     Reserves x of length 2 words, y of length 1 word, z of length 3 words
 #     Variables will be evaluated to hardcoded address so then a command like STA x[0] will store A in x[0].
+#     LDIA x will store the address of x into A which could be useful for some of the more complex addressing modes
 #     x is equivalent to x[0]. Out of bound indexing is enforced and disallowed at compile time
 #     Variables cannot start with digits
 #     There is no guarentee in the ordering or position of the variables, other than that they will be after all user provided instructions and will
