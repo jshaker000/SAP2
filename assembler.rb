@@ -123,7 +123,8 @@ OPS = {
   ROLC:   { opcode: 0x0045, argument: false },
   RORC:   { opcode: 0x0046, argument: false },
   INV:    { opcode: 0x0047, argument: false },
-  CHK:    { opcode: 0x0048, argument: false },
+  NEG:    { opcode: 0x0048, argument: false },
+  CHK:    { opcode: 0x0049, argument: false },
   HALT:   { opcode: 0xffff, argument: false }
 }
 

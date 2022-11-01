@@ -20,6 +20,7 @@
   localparam [ALU_OP_WIDTH-1:0] ALU_ROLC = 10;
   localparam [ALU_OP_WIDTH-1:0] ALU_RORC = 11;
   localparam [ALU_OP_WIDTH-1:0] ALU_INV  = 12;
+  localparam [ALU_OP_WIDTH-1:0] ALU_NEG  = 13;
   localparam [ALU_OP_WIDTH-1:0] ALU_CHK  = 15;
 
   localparam SO_POS  = 22; // stack output enable
@@ -79,6 +80,7 @@
   localparam [CONTROL_WORD_WIDTH-1:0] c_ROLC  = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_ROLC} << ALU_OP_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_RORC  = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_RORC} << ALU_OP_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_INV   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_INV}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_NEG   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_NEG}  << ALU_OP_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_CHK   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_CHK}  << ALU_OP_POS;
 
   localparam [CONTROL_WORD_WIDTH-1:0] c_MI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MI_POS;

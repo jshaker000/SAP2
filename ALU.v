@@ -54,6 +54,7 @@ module ALU (
   wire [WIDTH:0] alu_rolc       = {i_a,     o_carry};
   wire [WIDTH:0] alu_rorc       = {o_carry, i_a};
   wire [WIDTH:0] alu_inv        = {1'b0,    ~i_a};
+  wire [WIDTH:0] alu_neg        = {1'b0,    -i_a};
   wire [WIDTH:0] alu_chk        = {1'b0,    i_a};
 
   wire [WIDTH:0] result         = i_op == ALU_ADD || i_op == ALU_SUB ? alu_add_or_sub :
@@ -68,6 +69,7 @@ module ALU (
                                   i_op == ALU_ROLC                   ? alu_rolc :
                                   i_op == ALU_RORC                   ? alu_rorc :
                                   i_op == ALU_INV                    ? alu_inv  :
+                                  i_op == ALU_NEG                    ? alu_neg  :
                                                                        alu_chk;
 
   assign o_data         = result[WIDTH-1:0];
