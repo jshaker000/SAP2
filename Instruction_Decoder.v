@@ -361,7 +361,7 @@ module Instruction_Decoder (
                      i_step == 'h2 ? c_EO | c_INV | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // NEG negate A, store in T. (twos complement)
-                   i_instruction == 16'h0049 ?
+                   i_instruction == 16'h0048 ?
                      i_step == 'h2 ? c_EO | c_NEG | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // CHK store A in T, updating flags (good to check for 0 or something like this)
