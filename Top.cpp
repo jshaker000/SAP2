@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <thread>
 
@@ -97,7 +98,7 @@ int main(int argc, char**argv)
         halt     = tb->Top->get_halt();
         out_data = tb->Top->get_out_data();
         if (out_in) {
-          std::cout << "Out Register (dec): " << out_data << " at clk " << k-1 << std::endl;
+          std::cout << "Out Register update / hex: " << std::hex << std::setw(4) << out_data << " / dec: " << std::dec << std::setw(5) << out_data << " / clk " << k-1 << std::endl;
         }
         out_in   = tb->Top->get_out_in();
         k++;
@@ -110,7 +111,6 @@ int main(int argc, char**argv)
     {
         exit_code = 0;
         std::cerr << "Success: Simulation Terminated successfully at a HLT at clk " << k-1 << std::endl;
-        std::cerr << "Out Register (dec): " << out_data << std::endl;
     }
     else
     {

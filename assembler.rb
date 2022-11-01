@@ -117,7 +117,13 @@ OPS = {
   XORC:   { opcode: 0x003f, argument: false },
   SL:     { opcode: 0x0040, argument: false },
   SR:     { opcode: 0x0041, argument: false },
-  ROL:    { opcode: 0x0042, argument: false },
+  ASR:    { opcode: 0x0042, argument: false },
+  ROL:    { opcode: 0x0043, argument: false },
+  ROR:    { opcode: 0x0044, argument: false },
+  ROLC:   { opcode: 0x0045, argument: false },
+  RORC:   { opcode: 0x0046, argument: false },
+  INV:    { opcode: 0x0047, argument: false },
+  CHK:    { opcode: 0x0048, argument: false },
   HALT:   { opcode: 0xffff, argument: false }
 }
 

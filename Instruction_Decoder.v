@@ -336,9 +336,33 @@ module Instruction_Decoder (
                    i_instruction == 16'h0041 ?
                      i_step == 'h2 ? c_EO | c_SR | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
-                   // ROL rotate A left 1 bit, moving carry into the LSB and the MSB into Carry, storing in T.
+                   // ASR arithmetic shift A right 1 bit (that is leave the sign of A), storing in T. MSB is discarded
                    i_instruction == 16'h0042 ?
+                     i_step == 'h2 ? c_EO | c_ASR | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // ROL rotate A left 1 bit, storing in T.
+                   i_instruction == 16'h0043 ?
                      i_step == 'h2 ? c_EO | c_ROL | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // ROR rotate A right 1 bit, storing in T.
+                   i_instruction == 16'h0044 ?
+                     i_step == 'h2 ? c_EO | c_ROR | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // ROLC rotate A left through carry 1 bit, moving the MSB of A into Carry and Carry into the LSB of A, storing in T.
+                   i_instruction == 16'h0045 ?
+                     i_step == 'h2 ? c_EO | c_ROLC | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // RORC rotate A right through carry 1 bit, moving the LSB of A into Carry and Carry into the MSB of A, storing in T.
+                   i_instruction == 16'h0046 ?
+                     i_step == 'h2 ? c_EO | c_RORC | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // INV invert A and store in T.
+                   i_instruction == 16'h0047 ?
+                     i_step == 'h2 ? c_EO | c_INV | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // CHK store A in T, updating flags (good to check for 0 or something like this)
+                   i_instruction == 16'h0048 ?
+                     i_step == 'h2 ? c_EO | c_CHK | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // HALT PROGRAM
                    i_instruction == 16'hffff ?

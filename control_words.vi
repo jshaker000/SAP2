@@ -1,12 +1,12 @@
 /* verilator lint_off UNUSED */
   // pnemonics for control words
-  localparam CONTROL_WORD_WIDTH = 28;
+  localparam CONTROL_WORD_WIDTH = 29;
 
-  localparam HLT_POS = 27; // Halt
-  localparam ADV_POS = 26; // Advance Instruction Counter to Next Instruction
+  localparam HLT_POS = 28; // Halt
+  localparam ADV_POS = 27; // Advance Instruction Counter to Next Instruction
 
   localparam ALU_OP_POS   = 23;
-  localparam ALU_OP_WIDTH  = 3;
+  localparam ALU_OP_WIDTH  = 4;
   localparam [ALU_OP_WIDTH-1:0] ALU_ADD  = 0;
   localparam [ALU_OP_WIDTH-1:0] ALU_SUB  = 1;
   localparam [ALU_OP_WIDTH-1:0] ALU_AND  = 2;
@@ -14,7 +14,13 @@
   localparam [ALU_OP_WIDTH-1:0] ALU_XOR  = 4;
   localparam [ALU_OP_WIDTH-1:0] ALU_SL   = 5;
   localparam [ALU_OP_WIDTH-1:0] ALU_SR   = 6;
-  localparam [ALU_OP_WIDTH-1:0] ALU_ROL  = 7;
+  localparam [ALU_OP_WIDTH-1:0] ALU_ASR  = 7;
+  localparam [ALU_OP_WIDTH-1:0] ALU_ROL  = 8;
+  localparam [ALU_OP_WIDTH-1:0] ALU_ROR  = 9;
+  localparam [ALU_OP_WIDTH-1:0] ALU_ROLC = 10;
+  localparam [ALU_OP_WIDTH-1:0] ALU_RORC = 11;
+  localparam [ALU_OP_WIDTH-1:0] ALU_INV  = 12;
+  localparam [ALU_OP_WIDTH-1:0] ALU_CHK  = 15;
 
   localparam SO_POS  = 22; // stack output enable
   localparam SPO_POS = 21; // stack pop
@@ -60,14 +66,20 @@
   localparam [CONTROL_WORD_WIDTH-1:0] c_SPO   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SPO_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_SPU   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SPU_POS;
 
-  localparam [CONTROL_WORD_WIDTH-1:0] c_ADD   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_ADD} << ALU_OP_POS;
-  localparam [CONTROL_WORD_WIDTH-1:0] c_SUB   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_SUB} << ALU_OP_POS;
-  localparam [CONTROL_WORD_WIDTH-1:0] c_AND   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_AND} << ALU_OP_POS;
-  localparam [CONTROL_WORD_WIDTH-1:0] c_OR    = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_OR}  << ALU_OP_POS;
-  localparam [CONTROL_WORD_WIDTH-1:0] c_XOR   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_XOR} << ALU_OP_POS;
-  localparam [CONTROL_WORD_WIDTH-1:0] c_SL    = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_SL}  << ALU_OP_POS;
-  localparam [CONTROL_WORD_WIDTH-1:0] c_SR    = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_SR}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_ADD   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_ADD}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SUB   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_SUB}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_AND   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_AND}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_OR    = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_OR}   << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_XOR   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_XOR}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SL    = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_SL}   << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SR    = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_SR}   << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_ASR   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_ASR}  << ALU_OP_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_ROL   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_ROL}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_ROR   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_ROR}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_ROLC  = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_ROLC} << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_RORC  = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_RORC} << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_INV   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_INV}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_CHK   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_CHK}  << ALU_OP_POS;
 
   localparam [CONTROL_WORD_WIDTH-1:0] c_MI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MI_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_MO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MO_POS;

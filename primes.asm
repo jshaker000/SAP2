@@ -15,7 +15,7 @@ LOOP:
   ADDI sieve
   LDTA
   MOVTC
-  ADDI 0
+  CHK
   JIZ SIEVE_START
 SIEVE_RET:
   ; increment the current prime by 1

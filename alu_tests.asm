@@ -37,8 +37,8 @@ START:
   JIC WONT_REACH
   OUTB
   OUTC
-  ROL
-  JIC HLT
+  ROLC
+  JIC WILL_REACH
 
 WONT_REACH:
   ; dead code
@@ -48,6 +48,13 @@ WONT_REACH:
   OUTC
   OUTC
   OUTC
+WILL_REACH:
+  ASR
+  OUTT
+  INV
+  OUTT
+  PASS
+  OUTT
 
 HLT:
   HALT

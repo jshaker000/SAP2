@@ -43,20 +43,32 @@ module ALU (
   wire           latch  = clk_en & i_latch_flags;
 
   wire [WIDTH:0] alu_add_or_sub = i_op == ALU_ADD ? i_a + i_t : i_a - i_t;
-  wire [WIDTH:0] alu_and        = {1'b0, i_a & i_t};
-  wire [WIDTH:0] alu_or         = {1'b0, i_a | i_t};
-  wire [WIDTH:0] alu_xor        = {1'b0, i_a ^ i_t};
-  wire [WIDTH:0] alu_sl         = {1'b0, i_a << 1};
-  wire [WIDTH:0] alu_sr         = {1'b0, i_a >> 1};
-  wire [WIDTH:0] alu_rol        = {i_a,     o_carry};
+  wire [WIDTH:0] alu_and        = {1'b0,    i_a & i_t};
+  wire [WIDTH:0] alu_or         = {1'b0,    i_a | i_t};
+  wire [WIDTH:0] alu_xor        = {1'b0,    i_a ^ i_t};
+  wire [WIDTH:0] alu_sl         = {1'b0,    i_a[WIDTH-2:0], 1'b0};
+  wire [WIDTH:0] alu_sr         = {1'b0,    1'b0,           i_a[WIDTH-1:1]};
+  wire [WIDTH:0] alu_asr        = {1'b0,    i_a[WIDTH-1],   i_a[WIDTH-1:1]};
+  wire [WIDTH:0] alu_rol        = {1'b0,    i_a[WIDTH-2:0], i_a[WIDTH-1]};
+  wire [WIDTH:0] alu_ror        = {1'b0,    i_a[0],         i_a[WIDTH-1:1]};
+  wire [WIDTH:0] alu_rolc       = {i_a,     o_carry};
+  wire [WIDTH:0] alu_rorc       = {o_carry, i_a};
+  wire [WIDTH:0] alu_inv        = {1'b0,    ~i_a};
+  wire [WIDTH:0] alu_chk        = {1'b0,    i_a};
 
   wire [WIDTH:0] result         = i_op == ALU_ADD || i_op == ALU_SUB ? alu_add_or_sub :
-                                  i_op == ALU_AND                    ? alu_and :
-                                  i_op == ALU_OR                     ? alu_or  :
-                                  i_op == ALU_XOR                    ? alu_xor :
-                                  i_op == ALU_SL                     ? alu_sl  :
-                                  i_op == ALU_SR                     ? alu_sr  :
-                                                                       alu_rol ;
+                                  i_op == ALU_AND                    ? alu_and  :
+                                  i_op == ALU_OR                     ? alu_or   :
+                                  i_op == ALU_XOR                    ? alu_xor  :
+                                  i_op == ALU_SL                     ? alu_sl   :
+                                  i_op == ALU_SR                     ? alu_sr   :
+                                  i_op == ALU_ASR                    ? alu_asr  :
+                                  i_op == ALU_ROL                    ? alu_rol  :
+                                  i_op == ALU_ROR                    ? alu_ror  :
+                                  i_op == ALU_ROLC                   ? alu_rolc :
+                                  i_op == ALU_RORC                   ? alu_rorc :
+                                  i_op == ALU_INV                    ? alu_inv  :
+                                                                       alu_chk;
 
   assign o_data         = result[WIDTH-1:0];
 

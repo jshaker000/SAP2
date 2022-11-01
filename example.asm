@@ -5,24 +5,41 @@ MULT_START:
   PUSHA
   PUSHB
   PUSHC
-  LDIC 0
+  MOVAC
+  ; if B > A, swap so we can always know B is the smaller of the two for loop optimization
   SUBB
-  JIC MULT_LOOP
-  MOVBT
+  JIC  MULT_SWAP
+  LDIA 0
+  JMP  MULT_LOOP
+MULT_SWAP:
+  MOVBC
   MOVAB
-  MOVTA
+  LDIA 0
 MULT_LOOP:
-  ADDI 0
-  JIZ MULT_END
-  SUBI 1
-  PUSHT
-  MOVCA
-  ADDB
+  ; check if we are done
+  PUSHA
+  MOVBA
+  CHK
   POPA
+  JIZ MULT_END
+  ; check if B is even or odd
+  JIO MULT_ADD
+  JMP MULT_SHIFT
+MULT_ADD:
+  ADDC
+  MOVTA
+MULT_SHIFT:
+  PUSHA
+  MOVBA
+  SR
+  MOVTB
+  MOVCA
+  SL
   MOVTC
+  POPA
   JMP MULT_LOOP
 MULT_END:
-  MOVCT
+  MOVAT
   POPC
   POPB
   POPA
@@ -44,13 +61,21 @@ RUN:
   PUSHPC
   JMP MULT_START
   OUTT
-  ; loop to compute the 5 times tables with repeated multiplication
+  ; 127 * 307
+  LDIA 127
+  OUTA
+  LDIB 307
+  OUTB
+  PUSHPC
+  JMP MULT_START
+  OUTT
+  ; loop to compute the 13 times tables with repeated multiplication
   ; yes, this is less efficient than just adding 5 but it shows calling a subroutine in a loop
   LDIA 1
-  LDIB 5
+  LDIB 13
 LOOP_5_TIMES_TABLES:
-  ; ADD 2**16 (1 - 1/5). If this carries, we know we are done
-  ADDI 52428
+  ; ADD 2**16 (1 - 1/13). If this carries, we know we are done
+  ADDI 60495
   JIC HLT
   PUSHPC
   JMP MULT_START
