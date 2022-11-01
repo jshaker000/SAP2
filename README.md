@@ -16,8 +16,10 @@ This computer is generally based on the SAP1 archetecture, but has these enhance
     1. Extended RAM to wordize of 16 bits, depth of 64k
     2. Extended all registers, including Program Counter, Memory Address Register, Bus to 16 bits to facilitate
     3. Added stack functionality
-    4. Added additional registers: Temp, B, C and added move instructions for each of them
-    5. Added ability to address into memory using registers, essentially allowing for array access and pointer arithmatic
+    4. Added additional registers: Temp (T), B, C and added move instructions for each of them
+    5. Added many new ALU op codes
+    6. Now all ALU ops include A and store to Temp
+    7. Added ability to address into memory using T, essentially allowing for array access and pointer arithmatic
 
 An example program is attached in `example.asm`, and is automatically assembled by running `make` via `assembler.rb` to generate `ram.hex` unless that file already exists.
 Running make runs the program in `ram.hex` so you can write and assemble your own code there if desired. Note that the assembler currently does not automatically stay in sync

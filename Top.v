@@ -65,7 +65,7 @@ module Top #(
 
   wire                       [STACK_WIDTH-1:0] stack;
 
-  // alu out
+  // alu
   wire                         [ALU_WIDTH-1:0] alu_data;
   wire                                         zero;
   wire                                         carry;
@@ -236,9 +236,9 @@ module Top #(
     .clk          (clk),
     .clk_en       (clk_en),
     .i_latch_flags(control_word[EL_POS]),
-    .i_sub        (control_word[SU_POS]),
+    .i_op         (control_word[ALU_OP_POS+ALU_OP_WIDTH-1:ALU_OP_POS]),
     .i_a          (a_reg),
-    .i_b          (t_reg),
+    .i_t          (t_reg),
     .o_zero       (zero),
     .o_carry      (carry),
     .o_odd        (odd),

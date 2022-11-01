@@ -1,37 +1,47 @@
 /* verilator lint_off UNUSED */
   // pnemonics for control words
-  localparam CONTROL_WORD_WIDTH = 26;
+  localparam CONTROL_WORD_WIDTH = 28;
 
-  localparam HLT_POS = 25; // Halt
-  localparam ADV_POS = 24; // Advance Instruction Counter to Next Instruction
+  localparam HLT_POS = 27; // Halt
+  localparam ADV_POS = 26; // Advance Instruction Counter to Next Instruction
 
-  localparam SO_POS  = 23; // stack output enable
-  localparam SPO_POS = 22; // stack pop
-  localparam SPU_POS = 21; // stack push
+  localparam ALU_OP_POS   = 23;
+  localparam ALU_OP_WIDTH  = 3;
+  localparam [ALU_OP_WIDTH-1:0] ALU_ADD  = 0;
+  localparam [ALU_OP_WIDTH-1:0] ALU_SUB  = 1;
+  localparam [ALU_OP_WIDTH-1:0] ALU_AND  = 2;
+  localparam [ALU_OP_WIDTH-1:0] ALU_OR   = 3;
+  localparam [ALU_OP_WIDTH-1:0] ALU_XOR  = 4;
+  localparam [ALU_OP_WIDTH-1:0] ALU_SL   = 5;
+  localparam [ALU_OP_WIDTH-1:0] ALU_SR   = 6;
+  localparam [ALU_OP_WIDTH-1:0] ALU_ROL  = 7;
 
-  localparam MI_POS  = 20; // mem address reg in
-  localparam MO_POS  = 19; // mem address reg out
+  localparam SO_POS  = 22; // stack output enable
+  localparam SPO_POS = 21; // stack pop
+  localparam SPU_POS = 20; // stack push
 
-  localparam RI_POS  = 18; // ram data in
-  localparam RO_POS  = 17; // ram data out
+  localparam MI_POS  = 19; // mem address reg in
+  localparam MO_POS  = 18; // mem address reg out
 
-  localparam II_POS  = 16; // instruction reg out
-  localparam IO_POS  = 15; // instruction reg in
+  localparam RI_POS  = 17; // ram data in
+  localparam RO_POS  = 16; // ram data out
 
-  localparam CRI_POS  = 14; // c register in
-  localparam CRO_POS  = 13; // c register out
+  localparam II_POS  = 15; // instruction reg out
+  localparam IO_POS  = 14; // instruction reg in
 
-  localparam BRI_POS  = 12; // b register in
-  localparam BRO_POS  = 11; // b register out
+  localparam CRI_POS  = 13; // c register in
+  localparam CRO_POS  = 12; // c register out
 
-  localparam TRI_POS  = 10; // temp register in
-  localparam TRO_POS  = 9;  // temp register out
+  localparam BRI_POS  = 11; // b register in
+  localparam BRO_POS  = 10; // b register out
 
-  localparam ARI_POS  = 8; // a register in
-  localparam ARO_POS  = 7; // a register out
+  localparam TRI_POS  = 9; // temp register in
+  localparam TRO_POS  = 8;  // temp register out
 
-  localparam SU_POS  = 6; // alu subtract
-  localparam EL_POS  = 5; // alu latch flags
+  localparam ARI_POS  = 7; // a register in
+  localparam ARO_POS  = 6; // a register out
+
+  localparam EL_POS  = 5; // alu subtract
   localparam EO_POS  = 4; // alu out
 
   localparam OI_POS  = 3; // out register in
@@ -49,6 +59,15 @@
   localparam [CONTROL_WORD_WIDTH-1:0] c_SO    = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SO_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_SPO   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SPO_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_SPU   = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SPU_POS;
+
+  localparam [CONTROL_WORD_WIDTH-1:0] c_ADD   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_ADD} << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SUB   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_SUB} << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_AND   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_AND} << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_OR    = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_OR}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_XOR   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_XOR} << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SL    = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_SL}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_SR    = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_SR}  << ALU_OP_POS;
+  localparam [CONTROL_WORD_WIDTH-1:0] c_ROL   = {{CONTROL_WORD_WIDTH-ALU_OP_WIDTH{1'b0}}, ALU_ROL}  << ALU_OP_POS;
 
   localparam [CONTROL_WORD_WIDTH-1:0] c_MI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MI_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_MO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MO_POS;
@@ -72,7 +91,6 @@
   localparam [CONTROL_WORD_WIDTH-1:0] c_ARO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << ARO_POS;
 
   localparam [CONTROL_WORD_WIDTH-1:0] c_EO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << EO_POS;
-  localparam [CONTROL_WORD_WIDTH-1:0] c_SU  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << SU_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_EL  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << EL_POS;
 
   localparam [CONTROL_WORD_WIDTH-1:0] c_OI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << OI_POS;

@@ -252,33 +252,93 @@ module Instruction_Decoder (
                    i_instruction == 16'h0031 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_TRI :
-                     i_step == 'h4 ? c_EO | c_TRI | c_EL | c_ADV :
+                     i_step == 'h4 ? c_EO | c_ADD | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // SUBI - subtract A by data, store into TMP. data is next word of ram
                    i_instruction == 16'h0032 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_TRI :
-                     i_step == 'h4 ? c_EO | c_SU | c_TRI | c_EL | c_ADV :
+                     i_step == 'h4 ? c_EO | c_SUB | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // ANDI - and A with data, store in TMP, data is next word of RAM
+                   i_instruction == 16'h0033 ?
+                     i_step == 'h2 ? c_MI | c_CO | c_CE :
+                     i_step == 'h3 ? c_RO | c_TRI :
+                     i_step == 'h4 ? c_EO | c_ADD | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // ORI - ori A with data, store in TMP, data is next word of RAM
+                   i_instruction == 16'h0034 ?
+                     i_step == 'h2 ? c_MI | c_CO | c_CE :
+                     i_step == 'h3 ? c_RO | c_TRI :
+                     i_step == 'h4 ? c_EO | c_OR | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // XORI - xor A with data, store in TMP, data is next word of RAM
+                   i_instruction == 16'h0035 ?
+                     i_step == 'h2 ? c_MI | c_CO | c_CE :
+                     i_step == 'h3 ? c_RO | c_TRI :
+                     i_step == 'h4 ? c_EO | c_XOR | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // ADD,B - add A to B, storing into TMP.
-                   i_instruction == 16'h0033 ?
+                   i_instruction == 16'h0036 ?
                      i_step == 'h2 ? c_BRO | c_TRI :
-                     i_step == 'h3 ? c_EO | c_TRI | c_EL | c_ADV :
+                     i_step == 'h3 ? c_EO | c_ADD | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // SUB,B - subtract A by B, storing in TMP
-                   i_instruction == 16'h0034 ?
+                   i_instruction == 16'h0037 ?
                      i_step == 'h2 ? c_BRO | c_TRI :
-                     i_step == 'h3 ? c_EO | c_SU | c_TRI | c_EL | c_ADV :
+                     i_step == 'h3 ? c_EO | c_SUB | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // AND,B - and A with B, storing in TMP
+                   i_instruction == 16'h0038 ?
+                     i_step == 'h2 ? c_BRO | c_TRI :
+                     i_step == 'h3 ? c_EO | c_AND | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // OR,B - or A with B, storing in TMP
+                   i_instruction == 16'h0039 ?
+                     i_step == 'h2 ? c_BRO | c_TRI :
+                     i_step == 'h3 ? c_EO | c_OR | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // XOR,B - xor A with B, storing in TMP
+                   i_instruction == 16'h003a ?
+                     i_step == 'h2 ? c_BRO | c_TRI :
+                     i_step == 'h3 ? c_EO | c_XOR | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // ADD,C - add A to C, storing into TMP.
-                   i_instruction == 16'h0035 ?
+                   i_instruction == 16'h003b ?
                      i_step == 'h2 ? c_CRO | c_TRI :
-                     i_step == 'h3 ? c_EO | c_TRI | c_EL | c_ADV :
+                     i_step == 'h3 ? c_EO | c_ADD | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // SUB,C - subtract A by C, storing in TMP
-                   i_instruction == 16'h0036 ?
+                   i_instruction == 16'h003c ?
                      i_step == 'h2 ? c_CRO | c_TRI :
-                     i_step == 'h3 ? c_EO | c_SU | c_TRI | c_EL | c_ADV :
+                     i_step == 'h3 ? c_EO | c_SUB | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // AND,C - and A with C, storing in TMP
+                   i_instruction == 16'h003d ?
+                     i_step == 'h2 ? c_CRO | c_TRI :
+                     i_step == 'h3 ? c_EO | c_AND | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // OR,C - or A with C, storing in TMP
+                   i_instruction == 16'h003e ?
+                     i_step == 'h2 ? c_CRO | c_TRI :
+                     i_step == 'h3 ? c_EO | c_OR | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // XOR,C - xor A with C, storing in TMP
+                   i_instruction == 16'h003f ?
+                     i_step == 'h2 ? c_CRO | c_TRI :
+                     i_step == 'h3 ? c_EO | c_XOR | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // SL shift A left 1 bit, storing in T. MSB is discarded
+                   i_instruction == 16'h0040 ?
+                     i_step == 'h2 ? c_EO | c_SL | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // SR shift A right 1 bit, storing in T. MSB is discarded
+                   i_instruction == 16'h0041 ?
+                     i_step == 'h2 ? c_EO | c_SR | c_TRI | c_EL | c_ADV :
+                     SHOULD_NEVER_REACH:
+                   // ROL rotate A left 1 bit, moving carry into the LSB and the MSB into Carry, storing in T.
+                   i_instruction == 16'h0042 ?
+                     i_step == 'h2 ? c_EO | c_ROL | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // HALT PROGRAM
                    i_instruction == 16'hffff ?
