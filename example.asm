@@ -70,10 +70,10 @@ RUN:
   JMP MULT_START
   OUTT
   ; loop to compute the 13 times tables with repeated multiplication
-  ; yes, this is less efficient than just adding 5 but it shows calling a subroutine in a loop
+  ; yes, this is less efficient than just adding 13 but it shows calling a subroutine in a loop
   LDIA 1
   LDIB 13
-LOOP_5_TIMES_TABLES:
+LOOP_13_TIMES_TABLES:
   ; ADD 2**16 (1 - 1/13). If this carries, we know we are done
   ADDI 60495
   JIC HLT
@@ -82,6 +82,6 @@ LOOP_5_TIMES_TABLES:
   OUTT
   ADDI 1
   MOVTA
-  JMP LOOP_5_TIMES_TABLES
+  JMP LOOP_13_TIMES_TABLES
 HLT:
   HALT
