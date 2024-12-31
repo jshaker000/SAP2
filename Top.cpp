@@ -89,6 +89,8 @@ int main(int argc, char**argv)
 
     bool          halt   = false;
     bool          out_in = false;
+    bool          had_out_in = false;
+    std::uint64_t time_last_out_in;
     std::uint64_t out_data = 0;
 
     std::uint64_t k = 1;
@@ -98,7 +100,15 @@ int main(int argc, char**argv)
         halt     = tb->Top->get_halt();
         out_data = tb->Top->get_out_data();
         if (out_in) {
-          std::cout << "Out Register update / hex: " << std::hex << std::setw(4) << out_data << " / dec: " << std::dec << std::setw(5) << out_data << " / clk " << k-1 << std::endl;
+          if (!had_out_in) {
+            std::cout << "Out Register update | hex: " << std::hex << std::setw(6) << out_data << " / dec: " << std::dec << std::setw(6) << out_data << " / clk " << std::setw(8) << k-1 << std::endl;
+            had_out_in = true;
+            time_last_out_in = k-1;
+          }
+          else {
+            std::cout << "Out Register update | hex: " << std::hex << std::setw(6) << out_data << " / dec: " << std::dec << std::setw(6) << out_data << " / clk " << std::setw(8) << k-1 << " (" << std::setw(8) << k-1-time_last_out_in << " clks since last print)" << std::endl;
+            time_last_out_in = k-1;
+          }
         }
         out_in   = tb->Top->get_out_in();
         k++;
