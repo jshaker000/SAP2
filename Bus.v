@@ -43,7 +43,7 @@ module Bus #(
   //left fill with 0's if need be, and mask with data with valids
   wire [BUS_WIDTH-1:0] a_reg_masked           =  {{BUS_WIDTH-A_REG_OUT_WIDTH{1'b0}},          i_a_reg_data}
                                                 & {BUS_WIDTH{i_a_reg_out}};
-  wire [BUS_WIDTH-1:0] t_reg_masked           =  {{BUS_WIDTH-B_REG_OUT_WIDTH{1'b0}},          i_t_reg_data}
+  wire [BUS_WIDTH-1:0] t_reg_masked           =  {{BUS_WIDTH-T_REG_OUT_WIDTH{1'b0}},          i_t_reg_data}
                                                 & {BUS_WIDTH{i_t_reg_out}};
   wire [BUS_WIDTH-1:0] b_reg_masked           =  {{BUS_WIDTH-B_REG_OUT_WIDTH{1'b0}},          i_b_reg_data}
                                                 & {BUS_WIDTH{i_b_reg_out}};

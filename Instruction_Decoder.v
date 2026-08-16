@@ -264,7 +264,7 @@ module Instruction_Decoder (
                    i_instruction == 16'h0033 ?
                      i_step == 'h2 ? c_MI | c_CO | c_CE :
                      i_step == 'h3 ? c_RO | c_TRI :
-                     i_step == 'h4 ? c_EO | c_ADD | c_TRI | c_EL | c_ADV :
+                     i_step == 'h4 ? c_EO | c_AND | c_TRI | c_EL | c_ADV :
                      SHOULD_NEVER_REACH:
                    // ORI - ori A with data, store in TMP, data is next word of RAM
                    i_instruction == 16'h0034 ?

@@ -52,7 +52,7 @@ module ALU (
   wire [WIDTH:0] alu_rol        = {1'b0,    i_a[WIDTH-2:0], i_a[WIDTH-1]};
   wire [WIDTH:0] alu_ror        = {1'b0,    i_a[0],         i_a[WIDTH-1:1]};
   wire [WIDTH:0] alu_rolc       = {i_a,     o_carry};
-  wire [WIDTH:0] alu_rorc       = {o_carry, i_a};
+  wire [WIDTH:0] alu_rorc       = {i_a[0],  o_carry, i_a[WIDTH-1:1]};
   wire [WIDTH:0] alu_inv        = {1'b0,    ~i_a};
   wire [WIDTH:0] alu_neg        = {1'b0,    -i_a};
   wire [WIDTH:0] alu_abs        = {1'b0,    i_a[WIDTH-1] ? -i_a : i_a};
