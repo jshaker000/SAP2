@@ -34,8 +34,8 @@
   localparam RI_POS  = 17; // ram data in
   localparam RO_POS  = 16; // ram data out
 
-  localparam II_POS  = 15; // instruction reg out
-  localparam IO_POS  = 14; // instruction reg in
+  localparam II_POS  = 15; // instruction reg in
+  localparam IO_POS  = 14; // instruction reg out
 
   localparam CRI_POS  = 13; // c register in
   localparam CRO_POS  = 12; // c register out
