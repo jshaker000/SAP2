@@ -11,6 +11,7 @@ ram.hex
 # Generated Files #
 # ############### #
 Instruction_Decoder.v
+OPCODES.txt
 
 # Compiled source #
 ###################
