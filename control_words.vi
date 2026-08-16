@@ -1,11 +1,11 @@
 /* verilator lint_off UNUSED */
   // pnemonics for control words
-  localparam CONTROL_WORD_WIDTH = 29;
+  localparam CONTROL_WORD_WIDTH = 30;
 
-  localparam HLT_POS = 28; // Halt
-  localparam ADV_POS = 27; // Advance Instruction Counter to Next Instruction
+  localparam HLT_POS = 29; // Halt
+  localparam ADV_POS = 28; // Advance Instruction Counter to Next Instruction
 
-  localparam ALU_OP_POS   = 23;
+  localparam ALU_OP_POS   = 24;
   localparam ALU_OP_WIDTH  = 4;
   localparam [ALU_OP_WIDTH-1:0] ALU_CHK  = 0;
   localparam [ALU_OP_WIDTH-1:0] ALU_ADD  = 1;
@@ -24,13 +24,14 @@
   localparam [ALU_OP_WIDTH-1:0] ALU_NEG  = 14;
   localparam [ALU_OP_WIDTH-1:0] ALU_ABS  = 15;
 
-  localparam SO_POS  = 22; // stack output enable
-  localparam SPO_POS = 21; // stack pop
-  localparam SPU_POS = 20; // stack push
+  localparam SO_POS  = 23; // stack output enable
+  localparam SPO_POS = 22; // stack pop
+  localparam SPU_POS = 21; // stack push
 
-  localparam MI_POS  = 19; // mem address reg in
-  localparam MO_POS  = 18; // mem address reg out
+  localparam MI_POS  = 20; // mem address reg in
+  localparam MO_POS  = 19; // mem address reg out
 
+  localparam RE_POS  = 18; // ram read enable
   localparam RI_POS  = 17; // ram data in
   localparam RO_POS  = 16; // ram data out
 
@@ -88,6 +89,7 @@
   localparam [CONTROL_WORD_WIDTH-1:0] c_MI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MI_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_MO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << MO_POS;
 
+  localparam [CONTROL_WORD_WIDTH-1:0] c_RE  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << RE_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_RI  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << RI_POS;
   localparam [CONTROL_WORD_WIDTH-1:0] c_RO  = {{CONTROL_WORD_WIDTH-1{1'b0}},1'b1} << RO_POS;
 

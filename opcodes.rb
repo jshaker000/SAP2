@@ -77,6 +77,8 @@ ALU_UNARY_DESC = {
   CHK:  'store A in T, updating flags (good to check for 0)'
 }.freeze
 
+FETCH_NEXT_RAM_AND_UPDATE_COUNTER = %i[MI RE CO CE]
+
 module Templates
   module_function
 
@@ -86,7 +88,7 @@ module Templates
     { argument: true,
       desc: "load #{dest} from RAM[addr]. addr is the next word in ram",
       steps: {
-        2 => %i[MI CO CE],
+        2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER,
         3 => [:RO, REG_IN.fetch(dest)]
       } }
   end
@@ -108,7 +110,7 @@ module Templates
     { argument: false,
       desc: "load #{dest} from RAM[T] (indirect through T)",
       steps: {
-        2 => %i[MI TRO],
+        2 => %i[MI RE TRO],
         3 => [:RO, REG_IN.fetch(dest)]
       } }
   end
@@ -173,7 +175,7 @@ module Templates
     { argument: true,
       desc: "#{ALU_VERB.fetch(op)} data, store into TMP. data is next word of ram",
       steps: {
-        2 => %i[MI CO CE],
+        2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER,
         3 => [:RO, :TRI],
         4 => [:EO, op, :TRI, :EL]
       } }
@@ -204,7 +206,7 @@ module Templates
     { argument: true,
       desc: "jump to RAM[addr] if #{flag} flag is set. addr is the next word of RAM",
       steps: {
-        2 => { ctrl: %i[MI CO CE], skip_unless: flag },
+        2 => { ctrl: %i[MI RE CO CE], skip_unless: flag },
         3 => %i[J RO]
       } }
   end
@@ -288,7 +290,7 @@ OPCODE_TABLE = [
   *%i[A B C].map { |r| entry(:"LDI#{r}", template: :load_immediate, dest: r) },
 
   entry(:JMP, argument: true, desc: 'jump to RAM[addr]. addr is the next word of RAM',
-        steps: { 2 => %i[MI CO CE], 3 => %i[J RO] }),
+        steps: { 2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER, 3 => %i[J RO] }),
   entry(:JIZ, template: :conditional_jump, flag: :zero),
   entry(:JIC, template: :conditional_jump, flag: :carry),
   entry(:JIO, template: :conditional_jump, flag: :odd),
@@ -405,6 +407,56 @@ def validate_opcode_table!(table)
     elsif !e[:argument] && fetches_operand
       errors << "#{e[:name]}: argument: false, but a step fetches an operand word " \
                  '(some step asserts MI+CO+CE together) -- argument: should probably be true'
+    end
+  end
+
+  # Stack.v's read path (see the module itself) is built on the assumption
+  # that a push and a pop never happen on the same cycle -- it uses that to
+  # pick, unambiguously, which of two candidate registers is fresh.
+  # Nothing in the datapath enforces that by itself; it's an invariant the *set of
+  # instructions* has to uphold. Enforcing it here means it's checked once,
+  # for every instruction, forever, instead of being something a future
+  # instruction author has to remember on their own.
+  table.each do |e|
+    e[:steps].each do |step, data|
+      next unless data[:ctrl].include?(:SPU) && data[:ctrl].include?(:SPO)
+
+      errors << "#{e[:name]} step #{step}: asserts both SPU (push) and SPO (pop) together -- " \
+                 'Stack.v assumes these never coincide on the same cycle'
+    end
+  end
+
+  # Ram.v's read and write paths share one physical address port (this is a
+  # single-port RAM) -- RI (write) and RE (read-trigger) can never both be
+  # asserted on the same cycle, for the same reason SPU/SPO can't: there's
+  # only one address the RAM can be looking at in a given cycle, and RI
+  # needs it to mean "the held MAR address" while RE needs it to mean "the
+  # live bus value" at the exact same moment.
+  table.each do |e|
+    e[:steps].each do |step, data|
+      next unless data[:ctrl].include?(:RI) && data[:ctrl].include?(:RE)
+
+      errors << "#{e[:name]} step #{step}: asserts both RI (write) and RE (read-trigger) together -- " \
+                 'Ram.v assumes these never coincide on the same cycle'
+    end
+  end
+
+  # RE is what actually tells Ram.v to sample an address and start a read;
+  # RO just shows whatever the RAM's output register is currently holding,
+  # completely decoupled from addressing. That means RO is only meaningful
+  # exactly one step after the RE that primed it -- an RO with no RE on the
+  # immediately preceding step reads garbage (whatever the output register
+  # was last set to by some earlier, unrelated read), not the value the
+  # instruction actually wants.
+  table.each do |e|
+    e[:steps].each do |step, data|
+      next unless data[:ctrl].include?(:RO)
+
+      prev = e[:steps][step - 1]
+      next if prev && prev[:ctrl].include?(:RE)
+
+      errors << "#{e[:name]} step #{step}: asserts RO, but step #{step - 1} does not assert RE -- " \
+                 'RO only returns valid data exactly one step after RE triggers the read'
     end
   end
 

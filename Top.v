@@ -14,15 +14,11 @@ module Top #(
 
   parameter PROGRAM_COUNTER_WIDTH = 16,
 
-  parameter RAM_DEPTH         = 2**PROGRAM_COUNTER_WIDTH,
-  parameter RAM_WIDTH         = 16,
-
   parameter INSTRUCTION_WIDTH  = 16,
   parameter INSTRUCTION_STEPS  = 32,
 
   parameter FILE               = "ram.hex",
 
-  localparam ADDRESS_WIDTH             = $clog2(RAM_DEPTH),
   localparam INSTRUCTION_COUNTER_WIDTH = $clog2(INSTRUCTION_STEPS)
 )(
   input wire clk,
@@ -52,10 +48,10 @@ module Top #(
   wire                  [INSTRUCTION_WIDTH-1:0] instruction;
 
   // memory address
-  wire                     [ADDRESS_WIDTH-1:0] memory_address;
+  wire                          [BUS_WIDTH-1:0] memory_address;
 
   // ram data
-  wire                         [RAM_WIDTH-1:0] ram_data;
+  wire                         [BUS_WIDTH-1:0] ram_data;
 
   // registers
   wire                       [A_REG_WIDTH-1:0] a_reg;
@@ -96,10 +92,10 @@ module Top #(
     .T_REG_OUT_WIDTH          (T_REG_WIDTH),
     .B_REG_OUT_WIDTH          (B_REG_WIDTH),
     .C_REG_OUT_WIDTH          (C_REG_WIDTH),
-    .MEMORY_ADDR_REG_OUT_WIDTH(ADDRESS_WIDTH),
+    .MEMORY_ADDR_REG_OUT_WIDTH(BUS_WIDTH),
     .ALU_OUT_WIDTH            (ALU_WIDTH),
     .STACK_OUT_WIDTH          (STACK_WIDTH),
-    .RAM_OUT_WIDTH            (RAM_WIDTH),
+    .RAM_OUT_WIDTH            (BUS_WIDTH),
     .PROGRAM_COUNTER_OUT_WIDTH(PROGRAM_COUNTER_WIDTH)
   ) inst_Bus (
     .i_a_reg_out           (control_word[ARO_POS]),
@@ -156,26 +152,26 @@ module Top #(
   );
 
   Register #(
-    .WIDTH(ADDRESS_WIDTH)
+    .WIDTH(BUS_WIDTH)
   ) inst_Register_Memory_Address (
     .clk          (clk),
     .clk_en       (clk_en),
     .i_load_enable(control_word[MI_POS]),
-    .i_load_data  (bus_out[ADDRESS_WIDTH-1:0]),
+    .i_load_data  (bus_out),
     .o_data       (memory_address)
   );
 
   Ram #(
-    .RAM_DEPTH(RAM_DEPTH),
-    .WIDTH    (RAM_WIDTH),
+    .WIDTH    (BUS_WIDTH),
     .FILE     (FILE)
   ) inst_Ram (
-    .clk          (clk),
-    .clk_en       (clk_en),
-    .i_address    (memory_address),
-    .i_load_enable(control_word[RI_POS]),
-    .i_load_data  (bus_out[RAM_WIDTH-1:0]),
-    .o_data       (ram_data)
+    .clk                      (clk),
+    .clk_en                   (clk_en),
+    .i_memory_address_register(memory_address),
+    .i_load_enable            (control_word[RI_POS]),
+    .i_read_enable            (control_word[RE_POS]),
+    .i_bus_data               (bus_out[BUS_WIDTH-1:0]),
+    .o_data                   (ram_data)
   );
 
   Register #(
