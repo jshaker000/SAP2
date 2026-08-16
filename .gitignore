@@ -8,6 +8,10 @@
 # ############ #
 ram.hex
 
+# Generated Files #
+# ############### #
+Instruction_Decoder.v
+
 # Compiled source #
 ###################
 obj_dir/

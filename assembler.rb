@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # Assembles machine code for the SAP2
-# Currently the OPCODE table here, unfortunately, can get out of sync with Instruction_Decoder.v
-# as there is no automated mechanism right now to generate one from the other
+# opcodes themselves live in opcodes.rb
 # SYNTAX
 #   For comments use ; ie
 #     ; Multiplication subrouting
@@ -27,6 +26,7 @@
 
 require 'optparse'
 require 'set'
+require_relative 'opcodes'
 
 def s_to_i_find_base(s, allow_zero: true, msg: '')
   r = if h = s.match?(/^0?x(\h+)$/)
@@ -50,84 +50,12 @@ RAM_DEPTH          = 2**16
 COMMENT_DELIMITER  = ';'
 ARG_BITS           = 16 # note arguments on on the next word
 
-OPS = {
-  NOP:    { opcode: 0x0000, argument: false },
-  LDA:    { opcode: 0x0001, argument: true },
-  LDB:    { opcode: 0x0002, argument: true },
-  LDC:    { opcode: 0x0003, argument: true },
-  STA:    { opcode: 0x0004, argument: true },
-  STT:    { opcode: 0x0005, argument: true },
-  STB:    { opcode: 0x0006, argument: true },
-  STC:    { opcode: 0x0007, argument: true },
-  LDTA:   { opcode: 0x0008, argument: false },
-  LDTB:   { opcode: 0x0009, argument: false },
-  LDTC:   { opcode: 0x000a, argument: false },
-  STTA:   { opcode: 0x000b, argument: false },
-  STTB:   { opcode: 0x000c, argument: false },
-  STTC:   { opcode: 0x000d, argument: false },
-  MOVAT:  { opcode: 0x000e, argument: false },
-  MOVAB:  { opcode: 0x000f, argument: false },
-  MOVAC:  { opcode: 0x0010, argument: false },
-  MOVTA:  { opcode: 0x0011, argument: false },
-  MOVTB:  { opcode: 0x0012, argument: false },
-  MOVTC:  { opcode: 0x0013, argument: false },
-  MOVBA:  { opcode: 0x0014, argument: false },
-  MOVBT:  { opcode: 0x0015, argument: false },
-  MOVBC:  { opcode: 0x0016, argument: false },
-  MOVCA:  { opcode: 0x0017, argument: false },
-  MOVCT:  { opcode: 0x0018, argument: false },
-  MOVCB:  { opcode: 0x0019, argument: false },
-  PUSHA:  { opcode: 0x001a, argument: false },
-  POPA:   { opcode: 0x001b, argument: false },
-  PUSHT:  { opcode: 0x001c, argument: false },
-  POPT:   { opcode: 0x001d, argument: false },
-  PUSHB:  { opcode: 0x001e, argument: false },
-  POPB:   { opcode: 0x001f, argument: false },
-  PUSHC:  { opcode: 0x0020, argument: false },
-  POPC:   { opcode: 0x0021, argument: false },
-  PUSHPC: { opcode: 0x0022, argument: false },
-  POPPC:  { opcode: 0x0023, argument: false },
-  PUSHMA: { opcode: 0x0024, argument: false },
-  POPMA:  { opcode: 0x0025, argument: false },
-  OUTA:   { opcode: 0x0026, argument: false },
-  OUTT:   { opcode: 0x0027, argument: false },
-  OUTB:   { opcode: 0x0028, argument: false },
-  OUTC:   { opcode: 0x0029, argument: false },
-  LDIA:   { opcode: 0x002a, argument: true },
-  LDIB:   { opcode: 0x002b, argument: true },
-  LDIC:   { opcode: 0x002c, argument: true },
-  JMP:    { opcode: 0x002d, argument: true },
-  JIZ:    { opcode: 0x002e, argument: true },
-  JIC:    { opcode: 0x002f, argument: true },
-  JIO:    { opcode: 0x0030, argument: true },
-  ADDI:   { opcode: 0x0031, argument: true },
-  SUBI:   { opcode: 0x0032, argument: true },
-  ANDI:   { opcode: 0x0033, argument: true },
-  ORI:    { opcode: 0x0034, argument: true },
-  XORI:   { opcode: 0x0035, argument: true },
-  ADDB:   { opcode: 0x0036, argument: false },
-  SUBB:   { opcode: 0x0037, argument: false },
-  ANDB:   { opcode: 0x0038, argument: false },
-  ORB:    { opcode: 0x0039, argument: false },
-  XORB:   { opcode: 0x003a, argument: false },
-  ADDC:   { opcode: 0x003b, argument: false },
-  SUBC:   { opcode: 0x003c, argument: false },
-  ANDC:   { opcode: 0x003d, argument: false },
-  ORC:    { opcode: 0x003e, argument: false },
-  XORC:   { opcode: 0x003f, argument: false },
-  SL:     { opcode: 0x0040, argument: false },
-  SR:     { opcode: 0x0041, argument: false },
-  ASR:    { opcode: 0x0042, argument: false },
-  ROL:    { opcode: 0x0043, argument: false },
-  ROR:    { opcode: 0x0044, argument: false },
-  ROLC:   { opcode: 0x0045, argument: false },
-  RORC:   { opcode: 0x0046, argument: false },
-  INV:    { opcode: 0x0047, argument: false },
-  NEG:    { opcode: 0x0048, argument: false },
-  ABS:    { opcode: 0x0049, argument: false },
-  CHK:    { opcode: 0x004a, argument: false },
-  HALT:   { opcode: 0xffff, argument: false }
-}
+# Built from the same table that generates Instruction_Decoder.v --
+# see opcodes.rb. This used to be a hand-maintained hash here, which is
+# exactly the kind of thing that drifts out of sync with the decoder.
+OPS = expand_opcode_table(OPCODE_TABLE).each_with_object({}) do |e, h|
+  h[e[:name]] = { opcode: e[:opcode], argument: e[:argument] }
+end
 
 options = {
   verbose:  false
@@ -160,7 +88,7 @@ known_symbols = Set.new(OPS.keys + %i[RESERVE CONSTANT])
 
 File.readlines(options.fetch(:input_file)).each_with_index do |l, i|
   l.strip!
-  l = l[0...l.index(COMMENT_DELIMITER)] if l.include?(COMMENT_DELIMITER)
+  l = l[0...l.index(COMMENT_DELIMITER)].rstrip if l.include?(COMMENT_DELIMITER)
   next if l.empty?
   l = l.split
   # we have a variable declaration
