@@ -13,7 +13,7 @@ The bench is written in C++ and is compiled using [Verilator](https://www.veripo
 ## Theory of Operation
 This computer is generally based on the SAP1 archetecture, but has these enhancements:
 
-    1. Extended RAM to wordize of 16 bits, depth of 64k
+    1. Extended RAM to wordize of 16 bits, depth of 64k (this also led to making the RAM support synchronous, as opposed to combinatorial, reads to fit in a block RAM)
     2. Extended all registers, including Program Counter, Memory Address Register, Bus to 16 bits to facilitate
     3. Added stack functionality
     4. Added additional registers: Temp (T), B, C and added move instructions for each of them
