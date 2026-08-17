@@ -45,6 +45,7 @@ MAX_STEPS = 32
 # a reader would expect.
 REGS = %i[A T B C].freeze
 REGS_NO_T = REGS.filter { |x| x != :T }.freeze
+REGS_NO_T_NO_A = REGS_NO_T.filter { |x| x != :A }.freeze
 
 # Maps a logical operand ("A", "B", "C", "T", the memory-address register,
 # or the program counter) to the control line that puts it *onto* or
@@ -263,11 +264,12 @@ OPCODE_TABLE = [
   entry(:NOP, argument: false, steps: { 2 => %i[ADV] },
         desc: 'do nothing and just advance counter'),
 
-  # ISA -- "LDT..." is reserved for the indirect-through-T family below),
-  # but ST does have STT, hence the different register lists here.
+  # Loading / storing
   *REGS.map { |r| entry(:"LD#{r}", template: :load_direct, dest: r) },
   *REGS.map { |r| entry(:"ST#{r}", template: :store_direct, src: r) },
+  *REGS.map { |r| entry(:"LDI#{r}", template: :load_immediate, dest: r) },
 
+  # ..., but indirect through T
   *REGS_NO_T.map { |r| entry(:"LDT#{r}", template: :load_indirect_t, dest: r) },
   *REGS_NO_T.map { |r| entry(:"STT#{r}", template: :store_indirect_t, src: r) },
 
@@ -291,21 +293,22 @@ OPCODE_TABLE = [
               'past the JMP instruction we presumably did just after PUSHPC',
         steps: { 2 => %i[SPO SO J], 3 => %i[CE], 4 => %i[CE] }),
 
-  *REGS.map { |r| entry(:"OUT#{r}", template: :out, src: r) },
-  *REGS.map { |r| entry(:"LDI#{r}", template: :load_immediate, dest: r) },
-
+  # jumps
   entry(:JMP, argument: true, desc: 'jump to RAM[addr]. addr is the next word of RAM',
         steps: { 2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER, 3 => %i[J RO] }),
   entry(:JIZ, template: :conditional_jump, flag: :zero),
   entry(:JIC, template: :conditional_jump, flag: :carry),
   entry(:JIO, template: :conditional_jump, flag: :odd),
 
+  # ALU
   *ALU_OPS.map { |op| entry(:"#{op}I", template: :alu_immediate, op: op) },
-
-  *%i[B C].flat_map { |reg| ALU_OPS.map { |op| entry(:"#{op}#{reg}", template: :alu_reg, op: op, reg: reg) } },
-
+  *REGS_NO_T_NO_A.flat_map { |reg| ALU_OPS.map { |op| entry(:"#{op}#{reg}", template: :alu_reg, op: op, reg: reg) } },
   *ALU_UNARY_DESC.each_key.map { |op| entry(op, template: :alu_unary, op: op) },
 
+  # "Outputs"
+  *REGS.map { |r| entry(:"OUT#{r}", template: :out, src: r) },
+
+  # Done
   entry(:HALT, argument: false, no_adv: true, desc: 'halt the program', steps: { 2 => %i[HLT] })
 ].freeze
 
