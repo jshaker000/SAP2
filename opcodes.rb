@@ -14,6 +14,9 @@
 # handful of instructions that are genuinely one-off (fetch/jump/HALT style
 # control flow).
 #
+# Instructions are described as having multiple steps, IE "microcode"
+# Each step asserts certain flags, which are defined in control_words.vi
+#
 # OPCODE_TABLE is an ARRAY, not a hash keyed by opcode number: an
 # instruction's opcode is simply its index in this array. That means two
 # instructions literally cannot collide on the same opcode -- there's no

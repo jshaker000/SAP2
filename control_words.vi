@@ -1,5 +1,6 @@
 /* verilator lint_off UNUSED */
   // pnemonics for control words
+  // (Required to match what's referenced in opcodes.rb)
   localparam CONTROL_WORD_WIDTH = 30;
 
   localparam HLT_POS = 29; // Halt
