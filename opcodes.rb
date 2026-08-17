@@ -45,7 +45,7 @@ MAX_STEPS = 32
 # a reader would expect.
 REGS = %i[A T B C].freeze
 REGS_NO_T = REGS.filter { |x| x != :T }.freeze
-REGS_NO_T_NO_A = REGS_NO_T.filter { |x| x != :A }.freeze
+REGS_NO_A = REGS.filter { |x| x != :A }.freeze
 
 # Maps a logical operand ("A", "B", "C", "T", the memory-address register,
 # or the program counter) to the control line that puts it *onto* or
@@ -302,7 +302,7 @@ OPCODE_TABLE = [
 
   # ALU
   *ALU_OPS.map { |op| entry(:"#{op}I", template: :alu_immediate, op: op) },
-  *REGS_NO_T_NO_A.flat_map { |reg| ALU_OPS.map { |op| entry(:"#{op}#{reg}", template: :alu_reg, op: op, reg: reg) } },
+  *REGS_NO_A.flat_map { |reg| ALU_OPS.map { |op| entry(:"#{op}#{reg}", template: :alu_reg, op: op, reg: reg) } },
   *ALU_UNARY_DESC.each_key.map { |op| entry(op, template: :alu_unary, op: op) },
 
   # "Outputs"
