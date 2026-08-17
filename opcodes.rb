@@ -39,6 +39,7 @@ MAX_STEPS = 32
 # MOV family and the PUSH/POP family enumerate registers in the same order
 # a reader would expect.
 REGS = %i[A T B C].freeze
+REGS_NO_T = REGS.filter { |x| x != :T }
 
 # Maps a logical operand ("A", "B", "C", "T", the memory-address register,
 # or the program counter) to the control line that puts it *onto* or
@@ -53,7 +54,7 @@ REG_IN  = { A: :ARI, T: :TRI, B: :BRI, C: :CRI, MA: :MI          }.freeze
 ALU_OPS = %i[ADD SUB AND OR XOR].freeze
 
 # Short English verb for each ALU op, used to build alu_immediate/alu_reg
-# doc strings ("add A to B, storing into TMP") without repeating it at
+# doc strings ("add A to B, storing into T") without repeating it at
 # every call site.
 ALU_VERB = { ADD: 'add A to', SUB: 'subtract A by', AND: 'and A with',
              OR: 'or A with', XOR: 'xor A with' }.freeze
@@ -159,10 +160,6 @@ module Templates
 
   # step2: MAR <= PC (addr of the immediate word), PC++
   # step3: dest <= RAM[MAR]   (the literal / resolved address itself)
-  #
-  # NOTE: this is structurally identical to load_direct. See the opcode
-  # table below for why LDA and LDIA currently behave the same way --
-  # that's flagged, not silently "fixed", here.
   def load_immediate(dest:)
     d = load_direct(dest: dest)
     d.merge(desc: "load literal/resolved-address operand directly into #{dest}")
@@ -173,7 +170,7 @@ module Templates
   # step4: T <= ALU(A op T), latch flags
   def alu_immediate(op:)
     { argument: true,
-      desc: "#{ALU_VERB.fetch(op)} data, store into TMP. data is next word of ram",
+      desc: "#{ALU_VERB.fetch(op)} data, store into T. data is next word of ram",
       steps: {
         2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER,
         3 => [:RO, :TRI],
@@ -185,7 +182,7 @@ module Templates
   # step3: T <= ALU(A op T), latch flags
   def alu_reg(op:, reg:)
     { argument: false,
-      desc: "#{ALU_VERB.fetch(op)} #{reg}, storing into TMP",
+      desc: "#{ALU_VERB.fetch(op)} #{reg}, storing into T",
       steps: {
         2 => [REG_OUT.fetch(reg), :TRI],
         3 => [:EO, op, :TRI, :EL]
@@ -206,7 +203,7 @@ module Templates
     { argument: true,
       desc: "jump to RAM[addr] if #{flag} flag is set. addr is the next word of RAM",
       steps: {
-        2 => { ctrl: %i[MI RE CO CE], skip_unless: flag },
+        2 => { ctrl: FETCH_NEXT_RAM_AND_UPDATE_COUNTER, skip_unless: flag },
         3 => %i[J RO]
       } }
   end
@@ -256,11 +253,11 @@ OPCODE_TABLE = [
   # LD has no LDT variant (T isn't a valid direct-load destination in this
   # ISA -- "LDT..." is reserved for the indirect-through-T family below),
   # but ST does have STT, hence the different register lists here.
-  *%i[A B C].map { |r| entry(:"LD#{r}", template: :load_direct, dest: r) },
+  *REGS_NO_T.map { |r| entry(:"LD#{r}", template: :load_direct, dest: r) },
   *REGS.map      { |r| entry(:"ST#{r}", template: :store_direct, src: r) },
 
-  *%i[A B C].map { |r| entry(:"LDT#{r}", template: :load_indirect_t, dest: r) },
-  *%i[A B C].map { |r| entry(:"STT#{r}", template: :store_indirect_t, src: r) },
+  *REGS_NO_T.map { |r| entry(:"LDT#{r}", template: :load_indirect_t, dest: r) },
+  *REGS_NO_T.map { |r| entry(:"STT#{r}", template: :store_indirect_t, src: r) },
 
   # Every (from, to) pair of distinct registers: MOVAT, MOVAB, MOVAC,
   # MOVTA, MOVTB, MOVTC, MOVBA, ...
@@ -287,7 +284,7 @@ OPCODE_TABLE = [
 
   *REGS.map { |r| entry(:"OUT#{r}", template: :out, src: r) },
 
-  *%i[A B C].map { |r| entry(:"LDI#{r}", template: :load_immediate, dest: r) },
+  *REGS_NO_T.map { |r| entry(:"LDI#{r}", template: :load_immediate, dest: r) },
 
   entry(:JMP, argument: true, desc: 'jump to RAM[addr]. addr is the next word of RAM',
         steps: { 2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER, 3 => %i[J RO] }),
