@@ -6,6 +6,8 @@
 #   * gen_decoder.rb requires this file to render Instruction_Decoder.v.erb
 #     into Instruction_Decoder.v.
 #
+# Note that changes to this file require re-assembling
+#
 # Every instruction is described once, either as a `template:` (expanded
 # below into concrete per-step control-word lists AND a doc string built
 # from the template's own parameters) or as raw `steps:` + `desc:` for the
@@ -25,8 +27,8 @@
 #
 # Step 0 and step 1 are the universal instruction fetch and are emitted
 # by the generator itself, not listed per-opcode:
-#   step 0: MI CO         (memory_address <= PC)
-#   step 1: RO II CE      (instruction <= RAM[memory_address], PC <= PC+1)
+#   step 0: MI RE CO CE   (memory_address <= PC, kick off a read of it, PC <= PC+1)
+#   step 1: RO II         (instruction <= RAM[memory_address])
 # validate_opcode_table! (bottom of this file) enforces that no instruction
 # below uses step 0, step 1, or a step number >= MAX_STEPS.
 
@@ -39,7 +41,7 @@ MAX_STEPS = 32
 # MOV family and the PUSH/POP family enumerate registers in the same order
 # a reader would expect.
 REGS = %i[A T B C].freeze
-REGS_NO_T = REGS.filter { |x| x != :T }
+REGS_NO_T = REGS.filter { |x| x != :T }.freeze
 
 # Maps a logical operand ("A", "B", "C", "T", the memory-address register,
 # or the program counter) to the control line that puts it *onto* or
@@ -78,30 +80,43 @@ ALU_UNARY_DESC = {
   CHK:  'store A in T, updating flags (good to check for 0)'
 }.freeze
 
-FETCH_NEXT_RAM_AND_UPDATE_COUNTER = %i[MI RE CO CE]
+# The common "consume the next instruction-stream word" step: latch PC's
+# current value into MAR (MI+CO), advance PC past it (CE), and trigger a
+# RAM read using that same value while it's still live on the bus (RE) so
+# the result is ready by the next step. Shared by every template that
+# needs an operand word
+FETCH_NEXT_RAM_AND_UPDATE_COUNTER = %i[MI RE CO CE].freeze
 
 module Templates
   module_function
 
-  # step2: MAR <= PC (addr of operand word), PC++
-  # step3: dest <= RAM[MAR]  (i.e. the operand word's own contents)
+  # step2: MAR <= PC (addr of operand word), PC++, kick off a read of it
+  # step3: RAM's output (the OPERAND WORD's value, i.e. the real target
+  #        address) is ready -- relatch it into MAR (MI) and kick off a
+  #        SECOND read using it (RE), completing the double-dereference
+  # step4: RAM's output (now RAM[RAM[addr]], the actual value) is ready
+  #        -- capture it into dest.
   def load_direct(dest:)
     { argument: true,
-      desc: "load #{dest} from RAM[addr]. addr is the next word in ram",
+      desc: "load #{dest} from RAM[RAM[addr]]. addr is the next word in ram (the operand)",
       steps: {
         2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER,
-        3 => [:RO, REG_IN.fetch(dest)]
+        3 => %i[RO MI RE],
+        4 => [:RO, REG_IN.fetch(dest)]
       } }
   end
 
-  # step2: MAR <= PC (addr of operand word), PC++
-  # step3: RAM[MAR] <= src   (writes into the operand word's own slot)
+  # step2: MAR <= PC (addr of operand word), PC++, kick off a read of it
+  # step3: RAM's output (the OPERAND WORD's value, i.e. the real target
+  #        address) is ready -- relatch it into MAR (MI).
+  # step4: RAM[MAR] <= src   (the actual target address, not the operand
   def store_direct(src:)
     { argument: true,
-      desc: "store #{src} into RAM[addr]. addr is the next word in ram",
+      desc: "store #{src} into RAM[RAM[addr]]. addr is the next word in ram (the operand)",
       steps: {
-        2 => %i[MI CO CE],
-        3 => [:RI, REG_OUT.fetch(src)]
+        2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER,
+        3 => %i[RO MI],
+        4 => [:RI, REG_OUT.fetch(src)]
       } }
   end
 
@@ -111,7 +126,7 @@ module Templates
     { argument: false,
       desc: "load #{dest} from RAM[T] (indirect through T)",
       steps: {
-        2 => %i[MI RE TRO],
+        2 => %i[MI TRO RE],
         3 => [:RO, REG_IN.fetch(dest)]
       } }
   end
@@ -133,8 +148,7 @@ module Templates
   end
 
   # SPU + whatever puts `src` on the bus. Covers PUSHA/T/B/C as well as
-  # PUSHPC (src: :PC) and PUSHMA (src: :MA) -- they were only "special
-  # cases" before because there was no shared register->control-line map.
+  # PUSHPC (src: :PC) and PUSHMA (src: :MA)
   def push(src:)
     { argument: false,
       desc: "push #{src} onto the stack",
@@ -142,7 +156,7 @@ module Templates
   end
 
   # SPO + SO (stack out onto the bus) + whatever latches it into `dest`.
-  # Covers POPMA (dest: :MA) the same way. POPPC is NOT this template --
+  # POPPC is NOT this template --
   # popping into the program counter needs the jump control line and an
   # extra cycle to account for the pushed return address landing after a
   # JMP, so it's defined with raw `steps:` below.
@@ -160,17 +174,22 @@ module Templates
 
   # step2: MAR <= PC (addr of the immediate word), PC++
   # step3: dest <= RAM[MAR]   (the literal / resolved address itself)
+  # This is a single fetch
   def load_immediate(dest:)
-    d = load_direct(dest: dest)
-    d.merge(desc: "load literal/resolved-address operand directly into #{dest}")
+    { argument: true,
+      desc: "load literal/resolved-address operand directly into #{dest}",
+      steps: {
+        2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER,
+        3 => [:RO, REG_IN.fetch(dest)]
+      } }
   end
 
   # step2: MAR <= PC, PC++
-  # step3: T <= RAM[MAR]              (fetch the immediate operand into T)
+  # step3: T <= RAM[MAR] (fetch the immediate operand into T)
   # step4: T <= ALU(A op T), latch flags
   def alu_immediate(op:)
     { argument: true,
-      desc: "#{ALU_VERB.fetch(op)} data, store into T. data is next word of ram",
+      desc: "#{ALU_VERB.fetch(op)} data, store into T. data is next word of ram (the operand)",
       steps: {
         2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER,
         3 => [:RO, :TRI],
@@ -201,7 +220,7 @@ module Templates
   # step3: J RO   (only reached if the flag was set)
   def conditional_jump(flag:)
     { argument: true,
-      desc: "jump to RAM[addr] if #{flag} flag is set. addr is the next word of RAM",
+      desc: "jump to RAM[addr] if #{flag} flag is set. addr is the next word of RAM (the operand)",
       steps: {
         2 => { ctrl: FETCH_NEXT_RAM_AND_UPDATE_COUNTER, skip_unless: flag },
         3 => %i[J RO]
@@ -241,20 +260,10 @@ OPCODE_TABLE = [
   entry(:NOP, argument: false, steps: { 2 => %i[ADV] },
         desc: 'do nothing and just advance counter'),
 
-  # NOTE: LDx/STx (direct load/store) use the `load_direct`/`store_direct`
-  # templates, which only fetch/write the OPERAND WORD itself -- they do
-  # not dereference it as an address the way their names imply. That makes
-  # them behave exactly like LDIx (see load_immediate below), and makes
-  # STx write back into its own operand slot rather than into the target
-  # address. This is flagged, not fixed, here -- see the LDA/STA
-  # discussion before changing it, since fixing it means adding a real 3rd
-  # step (re-latch MAR from the fetched address, then read again).
-  #
-  # LD has no LDT variant (T isn't a valid direct-load destination in this
   # ISA -- "LDT..." is reserved for the indirect-through-T family below),
   # but ST does have STT, hence the different register lists here.
-  *REGS_NO_T.map { |r| entry(:"LD#{r}", template: :load_direct, dest: r) },
-  *REGS.map      { |r| entry(:"ST#{r}", template: :store_direct, src: r) },
+  *REGS.map { |r| entry(:"LD#{r}", template: :load_direct, dest: r) },
+  *REGS.map { |r| entry(:"ST#{r}", template: :store_direct, src: r) },
 
   *REGS_NO_T.map { |r| entry(:"LDT#{r}", template: :load_indirect_t, dest: r) },
   *REGS_NO_T.map { |r| entry(:"STT#{r}", template: :store_indirect_t, src: r) },
@@ -266,7 +275,7 @@ OPCODE_TABLE = [
   end,
 
   # PUSHA, POPA, PUSHT, POPT, PUSHB, POPB, PUSHC, POPC
-  *REGS.flat_map { |r| [entry(:"PUSH#{r}", template: :push, src: r), entry(:"POP#{r}", template: :pop, dest: r)] },
+  *(REGS + %i[MA]).flat_map { |r| [entry(:"PUSH#{r}", template: :push, src: r), entry(:"POP#{r}", template: :pop, dest: r)] },
 
   entry(:PUSHPC, template: :push, src: :PC),
 
@@ -279,12 +288,8 @@ OPCODE_TABLE = [
               'past the JMP instruction we presumably did just after PUSHPC',
         steps: { 2 => %i[SPO SO J], 3 => %i[CE], 4 => %i[CE] }),
 
-  entry(:PUSHMA, template: :push, src: :MA),
-  entry(:POPMA,  template: :pop,  dest: :MA),
-
   *REGS.map { |r| entry(:"OUT#{r}", template: :out, src: r) },
-
-  *REGS_NO_T.map { |r| entry(:"LDI#{r}", template: :load_immediate, dest: r) },
+  *REGS.map { |r| entry(:"LDI#{r}", template: :load_immediate, dest: r) },
 
   entry(:JMP, argument: true, desc: 'jump to RAM[addr]. addr is the next word of RAM',
         steps: { 2 => FETCH_NEXT_RAM_AND_UPDATE_COUNTER, 3 => %i[J RO] }),
@@ -444,7 +449,9 @@ def validate_opcode_table!(table)
   # exactly one step after the RE that primed it -- an RO with no RE on the
   # immediately preceding step reads garbage (whatever the output register
   # was last set to by some earlier, unrelated read), not the value the
-  # instruction actually wants.
+  # instruction actually wants. This is exactly the JMP bug: step 2 fetched
+  # the address into MAR without ever asserting RE, so step 3's RO read
+  # stale data instead of the actual jump target.
   table.each do |e|
     e[:steps].each do |step, data|
       next unless data[:ctrl].include?(:RO)

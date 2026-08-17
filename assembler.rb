@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # Assembles machine code for the SAP2
 # opcodes themselves live in opcodes.rb
+#   Note that changes to opcodes.rb require reassembly
 # SYNTAX
 #   For comments use ; ie
 #     ; Multiplication subrouting
